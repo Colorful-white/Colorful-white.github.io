@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>我的小站</title>
+<meta name="description" content="一个放自己做的东西的地方。">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ 页头：改成你自己的介绍 ============ -->
+  <header class="site-head">
+    <h1>你好，我是 Colorful-white</h1>
+    <p>
+      平时写点小工具、做点自己想用的东西。这里放一些做完的成品和随手记的东西。
+    </p>
+    <div class="links">
+      <a href="https://github.com/Colorful-white">GitHub</a>
+      <!-- 想留邮箱就把下面这行的注释去掉。注意：公开在网页上会被爬虫抓去发垃圾邮件 -->
+      <!-- <a href="mailto:你的邮箱">邮箱</a> -->
+    </div>
+  </header>
+
+  <!-- ============ 作品：一个 <a class="card"> 就是一张卡 ============ -->
+  <section>
+    <h2>做过的东西</h2>
+    <div class="cards">
+
+      <a class="card" href="projects/deskpet.html">
+        <img class="thumb" src="images/deskpet.png" alt="桌宠预览">
+        <div class="body">
+          <h3>桌宠 DeskPet</h3>
+          <p>待在 Windows 桌面上的兽耳小人，你听歌的时候它戴着耳机一起听，跟着副歌蹦、跟着歌词唱。</p>
+          <span class="tag">Python</span>
+        </div>
+      </a>
+
+      <!-- 复制上面这一整块 <a>…</a> 就能加新作品 -->
+      <a class="card" href="#">
+        <img class="thumb" src="images/placeholder.svg" alt="">
+        <div class="body">
+          <h3>下一个作品</h3>
+          <p>这里写一两句话说清楚它是什么、解决了什么问题。</p>
+          <span class="tag">标签</span>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- ============ 随手写：文字 + 图片都行 ============ -->
+  <section>
+    <h2>随手写</h2>
+
+    <div class="note">
+      <div class="date">2026-09-10</div>
+      <h3>建了个站</h3>
+      <p>
+        终于把自己的网站搭起来了。以后做完的东西就往这儿放，
+        不用再翻聊天记录找截图了。
+      </p>
+    </div>
+
+    <div class="note">
+      <div class="date">2026-09-01</div>
+      <h3>带图的一条</h3>
+      <p>图片放进 images 文件夹，然后像下面这样引用就行：</p>
+      <img src="images/placeholder.svg" alt="示意图">
+    </div>
+
+  </section>
+
+  <footer>
+    © 2026 Colorful-white
+  </footer>
+
+</div>
+</body>
+</html>
