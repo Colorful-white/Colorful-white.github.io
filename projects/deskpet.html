@@ -3,8 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>桌宠 DeskPet — 我的小站</title>
-<meta name="description" content="待在 Windows 桌面上的兽耳小人，会跟着你听的歌一起蹦一起唱。">
+<title>桌宠 DeskPet — Colorful-white</title>
+<meta name="description" content="住在 Windows 桌面上的像素小人，抓系统声音做频谱分析，跟着副歌蹦、跟着歌词唱。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐾</text></svg>">
+<meta property="og:type" content="article">
+<meta property="og:title" content="桌宠 DeskPet">
+<meta property="og:description" content="住在 Windows 桌面上的像素小人，抓系统声音做频谱分析，跟着副歌蹦、跟着歌词唱。">
+<meta property="og:image" content="https://colorful-white.github.io/images/deskpet-cover.png">
 <link rel="stylesheet" href="../style.css">
 </head>
 <body>
@@ -14,48 +19,124 @@
 
   <article>
     <h1>桌宠 DeskPet</h1>
-    <p class="meta">Python · 2025 — 至今</p>
+    <p class="meta">Python · Tkinter · 没用游戏引擎 · <a href="https://github.com/Colorful-white/deskpet">源码 (MIT)</a></p>
 
-    <p>
+    <p class="lede">
       一只待在 Windows 桌面上的兽耳小人：会自己乱跑、能被拖来拖去、会定时提醒你休息。
-      最花心思的是听歌联动——它戴着耳机跟你一起听，听得出安静段落和副歌，
-      会跟着音量蹦，还会跟着歌词一起唱。
+      <strong>你听歌的时候它会戴着耳机一起听</strong>——听得出安静段落和副歌，会跟着音量蹦，
+      还会跟着歌词一起唱。
     </p>
 
     <figure>
-      <img src="../images/deskpet.png" alt="桌宠在桌面上的样子">
-      <figcaption>桌面上的样子</figcaption>
+      <video controls preload="none" poster="../images/deskpet-cover.png" playsinline>
+        <source src="../videos/deskpet-demo.mp4" type="video/mp4">
+        你的浏览器放不了这个视频，<a href="../videos/deskpet-demo.mp4">点这里下载</a>。
+      </video>
+      <figcaption>演示片：溜达、拖拽、小房间、听歌跟唱</figcaption>
     </figure>
 
-    <h2>为什么做</h2>
-    <p>
-      （这里写做之前遇到的问题、或者单纯就是想要一个。真话比套话好看。）
-    </p>
+    <h2>它会做什么</h2>
+    <div class="table-scroll">
+    <table>
+      <tr><th>陪你听歌</th><td>抓系统正在播的声音做频谱分析，按段落换动作</td></tr>
+      <tr><th>跟着唱</th><td>认出歌名后去找带时间轴的歌词，到点了挑几句唱出来</td></tr>
+      <tr><th>小房间</th><td>屏幕右侧挂着一间小屋，拖进去它就住下，只在屋里踱步；困了自己走到床垫那头躺下，饿了走到食盆边蹲着吃</td></tr>
+      <tr><th>拖拽</th><td>按住左键拖走，松手会掉下来落到桌面底部；甩出去还会滑一段</td></tr>
+      <tr><th>番茄钟</th><td>25 分钟专注 + 5 分钟休息，到点冒气泡喊你</td></tr>
+      <tr><th>随机说话</th><td>隔一阵冒一句，内容全在配置文件里，想让它说什么就往里加</td></tr>
+      <tr><th>睡觉</th><td>太久没人理就自己睡了，双击叫醒</td></tr>
+    </table>
+    </div>
 
-    <h2>做了什么</h2>
-    <ul>
-      <li>像素 Q 版形象，自己在桌面上乱走、可拖动</li>
-      <li>读系统音频输出，识别安静段落和副歌，跟着音量做动作</li>
-      <li>歌词同步，会跟着一起唱</li>
-      <li>久坐提醒</li>
-    </ul>
+    <h2>听歌的时候它在干嘛</h2>
+    <p>
+      它是真的在「听」：用 WASAPI 环回把系统正在播放的声音抓回来做频谱分析，
+      所以知道的不只是「有多大声」，还有「什么声音」。
+    </p>
+    <div class="table-scroll">
+    <table>
+      <tr><th>听到什么</th><th>它做什么</th></tr>
+      <tr><td>安静的段落</td><td>轻轻摇摆，偶尔小声哼一句</td></tr>
+      <tr><td>普通段落</td><td>扭腰跳舞、拍手、甩头、打碟，换着来</td></tr>
+      <tr><td>副歌（能量持续很高）</td><td>举起手蹦蹦跳跳，话也变得很兴奋</td></tr>
+      <tr><td>音量突然拔高</td><td>当场腾空蹦一下</td></tr>
+      <tr><td>音色亮（高频多）</td><td>音符冒得更密，会说「这段亮晶晶的！」</td></tr>
+      <tr><td>鼓点重（低频强）</td><td>跟着咚咚点头，会说「地板都在震！」</td></tr>
+    </table>
+    </div>
+    <p>
+      同一段音乐里每隔 4~9 秒会换一个花样，不会一个动作循环到底。
+      耳机和头顶的光环在放歌时会变亮，一眼就能看出它在听。
+    </p>
 
     <h2>踩过的坑</h2>
+
+    <div class="pit">
+      <h3>置顶窗口会互相盖住，小人看起来凭空消失</h3>
+      <p>
+        小人和小房间是两个独立的置顶窗口，而 Windows 会把「被点到的那个」抬到同层最前面。
+        所以光是按住房间准备拖，就足以让不透明的房间盖住小人。
+        解法是房间每次被碰到都回调一次重排，把顺序压回「房间 → 小人 → 气泡」，另外每秒自查一次兜底。
+      </p>
+    </div>
+
+    <div class="pit">
+      <h3>歌词整首都偏，因为起算点选错了</h3>
+      <p>
+        播放器换歌时是<strong>先改标题、再出声</strong>的，中间差着零点几秒到一秒。
+        一开始拿「标题变了的那一刻」当歌曲开头，结果整首歌的歌词都往前偏。
+        改成以「声音真正响起来的那一刻」起算才对得上。
+      </p>
+    </div>
+
+    <div class="pit">
+      <h3>网易云根本不往系统媒体接口注册</h3>
+      <p>
+        Spotify、浏览器里的 B 站走 Windows 的 SMTC 接口，能拿到歌名和播放进度；
+        网易云这类播放器压根不报。退路是读它的窗口标题——就是「歌名 - 歌手」。
+      </p>
+      <p>
+        但标题给不了播放进度，于是再退一层：如果这首歌是<strong>在桌宠眼皮底下起头的</strong>
+        （靠「歌名出现之前那几秒是安静的」判断），就从那一刻自己数秒；
+        要是启动时歌已经放到一半，就<strong>这首不唱</strong>——宁可不唱，也不唱错。
+      </p>
+    </div>
+
+    <h2>形象是怎么画的</h2>
     <p>
-      （这一段其实最值得写。别人看作品集，最想看的是你怎么解决问题的。）
+      32×44 像素，窗口里整数放大 3 倍。两头身、大眼、粗描边、平涂色，
+      画法参考明日方舟基建小人那类 Q 版像素立绘，角色是原创的。
     </p>
+    <p>
+      没有用画图软件——整个形象是写在 Python 源码里的字符画，一个字符等于一个像素，
+      <code>'.'</code> 表示透明：
+    </p>
+    <pre><code>LEG = Grid.from_ascii([
+    "ollo",     # o=描边  l=裤子
+    "ollo",
+    "ollo",
+    "offo",     # f=鞋
+    "oooo",
+])</code></pre>
+    <p>
+      好处是改动作不用重画整张图，挪一下各部件的位移就行；
+      打错的字符会在预览图里画成红色，一眼能看见。
+    </p>
+    <figure>
+      <img class="pixel" src="../images/deskpet-sheet.png" alt="所有动作的所有帧拼成的预览图" loading="lazy">
+      <figcaption>预览工具把所有动作的所有帧拼成一张图，改完先看这个再上桌面</figcaption>
+    </figure>
 
     <h2>怎么跑</h2>
+    <p>依赖全是可选的，装了功能更全；一个都不装也能跑，只是不跟着声音动。</p>
     <pre><code>python -m pip install -r requirements.txt
 python main.py</code></pre>
-
-    <p style="margin-top:32px">
-      <a href="https://github.com/Colorful-white/deskpet">在 GitHub 上看源码 →</a>
-    </p>
+    <p><a href="https://github.com/Colorful-white/deskpet">在 GitHub 上看源码 →</a></p>
   </article>
 
   <footer>
-    © 2026 Colorful-white
+    <span>© 2026 Colorful-white</span>
+    <span><a href="../index.html">回首页</a></span>
   </footer>
 
 </div>

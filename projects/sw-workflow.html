@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SolidWorks 参数化批量建模 — Colorful-white</title>
+<meta name="description" content="一张 CSV 一行一个零件，脚本自己建模、存件、出图，再拿解析公式核对体积。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐾</text></svg>">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SolidWorks 参数化批量建模">
+<meta property="og:description" content="一张 CSV 一行一个零件，脚本自己建模、存件、出图，再拿解析公式核对体积。">
+<meta property="og:image" content="https://colorful-white.github.io/images/sw-plate.png">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <a class="back" href="../index.html">← 回首页</a>
+
+  <article>
+    <h1>SolidWorks 参数化批量建模</h1>
+    <p class="meta">Python · COM 自动化 · SolidWorks 2023</p>
+
+    <p class="lede">
+      把「改个尺寸、重新建一遍、导个图、量一下体积对不对」这套重复动作交给脚本：
+      <strong>params.csv 里一行就是一个零件</strong>，跑一遍，
+      SLDPRT、PNG、核对报告全都出来了。
+    </p>
+
+    <figure class="narrow">
+      <img src="../images/sw-plate.png" alt="脚本建出的四角开孔安装板" loading="lazy">
+      <figcaption>plate_A：100 × 60 × 10，四角 Ø8 通孔，孔心距两邻边各 12</figcaption>
+    </figure>
+
+    <h2>流程</h2>
+    <pre><code>读 params.csv → 逐行建模 → 存 SLDPRT + PNG → 用解析公式核对体积 → 写 report.csv</code></pre>
+    <p>
+      零件族是「L × W × T 的矩形板，四角各一个 Ø hole_dia 的通孔，孔心距两条邻边各 margin」。
+      输入长这样：
+    </p>
+    <div class="table-scroll">
+    <table>
+      <tr><th>name</th><th>L</th><th>W</th><th>T</th><th>hole_dia</th><th>margin</th></tr>
+      <tr><td>plate_A</td><td>100</td><td>60</td><td>10</td><td>8</td><td>12</td></tr>
+      <tr><td>plate_B</td><td>150</td><td>80</td><td>12</td><td>10</td><td>15</td></tr>
+      <tr><td>plate_C</td><td>80</td><td>80</td><td>6</td><td>6</td><td>10</td></tr>
+    </table>
+    </div>
+
+    <h2>怎么确认建对了</h2>
+    <p>
+      建模脚本最怕的是「跑完没报错，但零件是错的」。所以每建完一个，
+      都从模型里读出实际体积，和解析公式算出来的理论值比：
+    </p>
+    <pre><code>理论体积 = L*W*T - 4 * pi * (hole_dia/2)^2 * T</code></pre>
+    <p>逐行写进 report.csv，对不上就是 FAIL：</p>
+    <div class="table-scroll">
+    <table>
+      <tr><th>name</th><th>volume_mm³</th><th>expected_mm³</th><th>err_pct</th><th>mass_g</th><th>verdict</th></tr>
+      <tr><td>plate_A</td><td>57989.381</td><td>57989.381</td><td>0.0</td><td>57.989</td><td>PASS</td></tr>
+      <tr><td>plate_B</td><td>140230.089</td><td>140230.089</td><td>0.0</td><td>140.230</td><td>PASS</td></tr>
+      <tr><td>plate_C</td><td>37721.416</td><td>37721.416</td><td>0.0</td><td>37.721</td><td>PASS</td></tr>
+    </table>
+    </div>
+
+    <h2>踩过的坑</h2>
+    <p>
+      SolidWorks 的 COM 接口是给 VBA 设计的，用 Python 晚绑定调它，
+      文档上写得通顺的地方实际全是雷。基础层里每一条注释都是实测换来的：
+    </p>
+
+    <div class="pit">
+      <h3>SaveAs3 的返回值不可信</h3>
+      <p>
+        它说保存成功不一定真落盘了。判断成败只能去看文件在不在硬盘上。
+      </p>
+    </div>
+
+    <div class="pit">
+      <h3>Callout 参数不能传 None</h3>
+      <p>
+        必须传一个 VT_DISPATCH 的空指针。传 Python 的 <code>None</code> 会直接炸。
+      </p>
+    </div>
+
+    <div class="pit">
+      <h3>中文版的默认模板路径指向一个不存在的文件</h3>
+      <p>
+        默认模板偏好指向 <code>零件.prtdot</code>，而这个文件并不在那儿。只能自己回退扫描去找。
+      </p>
+    </div>
+
+    <div class="pit">
+      <h3>版本之间接口会消失</h3>
+      <p>
+        <code>CreateMassProperty</code> 在 SW2023 上已经不能用了，得改走
+        <code>Extension.GetMassProperties2</code>。另外
+        <code>RevisionNumber</code>、<code>GetTitle</code> 这些在晚绑定下是属性不是方法，当方法调就报错。
+      </p>
+    </div>
+
+    <h2>单位这件事单独说</h2>
+    <p>
+      SolidWorks API 内部<strong>一律用米</strong>，而画图的人脑子里全是毫米。
+      与其每次调用都换算、每次都可能忘，不如定死一条边界：
+      基础层对外的接口全部收发毫米，米只存在于基础层内部，转换只在边界上做一次。
+    </p>
+
+    <!-- 以后要是把这个仓库也开源了，在这儿加一行源码链接 -->
+  </article>
+
+  <footer>
+    <span>© 2026 Colorful-white</span>
+    <span><a href="../index.html">回首页</a></span>
+  </footer>
+
+</div>
+</body>
+</html>

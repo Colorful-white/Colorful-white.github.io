@@ -3,77 +3,108 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>我的小站</title>
-<meta name="description" content="一个放自己做的东西的地方。">
+<title>Colorful-white</title>
+<meta name="description" content="做点自己想用的东西：会跟着音乐跳舞的桌宠、SolidWorks 参数化建模脚本。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐾</text></svg>">
+<!-- 分享到微信/QQ 时显示的预览卡片 -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Colorful-white">
+<meta property="og:description" content="做点自己想用的东西：会跟着音乐跳舞的桌宠、SolidWorks 参数化建模脚本。">
+<meta property="og:image" content="https://colorful-white.github.io/images/deskpet-cover.png">
+<meta property="og:url" content="https://colorful-white.github.io/">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="wrap">
 
-  <!-- ============ 页头：改成你自己的介绍 ============ -->
+  <!-- ================= 页头 ================= -->
   <header class="site-head">
     <h1>你好，我是 Colorful-white</h1>
-    <p>
-      平时写点小工具、做点自己想用的东西。这里放一些做完的成品和随手记的东西。
+    <p class="lede">
+      做点自己想用的东西。大部分时候是 Python：
+      桌面上养一只会跟着音乐跳舞的像素小人，或者让 SolidWorks 自己把零件建完。
+      这里放做完的成品，和一些过程里的记录。
     </p>
     <div class="links">
       <a href="https://github.com/Colorful-white">GitHub</a>
-      <!-- 想留邮箱就把下面这行的注释去掉。注意：公开在网页上会被爬虫抓去发垃圾邮件 -->
+      <!-- 想留联系方式就把下面这行的注释去掉、填上邮箱。注意公开在网页上会被爬虫抓去发垃圾邮件 -->
       <!-- <a href="mailto:你的邮箱">邮箱</a> -->
     </div>
   </header>
 
-  <!-- ============ 作品：一个 <a class="card"> 就是一张卡 ============ -->
+  <!-- ================= 作品 ================= -->
   <section>
-    <h2>做过的东西</h2>
+    <h2 class="sec">做过的东西</h2>
     <div class="cards">
 
-      <a class="card" href="projects/deskpet.html">
-        <img class="thumb" src="images/deskpet.png" alt="桌宠预览">
+      <a class="card card--feature" href="projects/deskpet.html">
+        <img class="thumb thumb--pixel" src="images/deskpet-room.png" alt="像素桌宠待在小房间里" loading="lazy">
         <div class="body">
           <h3>桌宠 DeskPet</h3>
-          <p>待在 Windows 桌面上的兽耳小人，你听歌的时候它戴着耳机一起听，跟着副歌蹦、跟着歌词唱。</p>
-          <span class="tag">Python</span>
+          <p>
+            一只住在 Windows 桌面上的像素小人。会自己溜达、能拖着走、待腻了钻进小房间睡觉。
+            最花心思的是听歌联动——它抓系统正在播的声音做频谱分析，分得出安静段落和副歌，
+            跟着音量蹦，还会对着时间轴把歌词唱出来。
+          </p>
+          <div class="tags">
+            <span class="tag">Python</span>
+            <span class="tag">Tkinter</span>
+            <span class="tag">WASAPI 频谱</span>
+            <span class="tag">像素画</span>
+          </div>
         </div>
       </a>
 
-      <!-- 复制上面这一整块 <a>…</a> 就能加新作品 -->
-      <a class="card" href="#">
-        <img class="thumb" src="images/placeholder.svg" alt="">
+      <a class="card" href="projects/sw-workflow.html">
+        <img class="thumb" src="images/sw-plate.png" alt="SolidWorks 建出的四角开孔安装板" loading="lazy">
         <div class="body">
-          <h3>下一个作品</h3>
-          <p>这里写一两句话说清楚它是什么、解决了什么问题。</p>
-          <span class="tag">标签</span>
+          <h3>SolidWorks 参数化批量建模</h3>
+          <p>
+            一张 CSV 一行一个零件，脚本自己建模、存件、出图，
+            最后拿解析公式核对体积，逐行给 PASS / FAIL。
+          </p>
+          <div class="tags">
+            <span class="tag">Python</span>
+            <span class="tag">COM 自动化</span>
+            <span class="tag">CAD</span>
+          </div>
         </div>
       </a>
 
     </div>
   </section>
 
-  <!-- ============ 随手写：文字 + 图片都行 ============ -->
+  <!-- ================= 随手写 ================= -->
   <section>
-    <h2>随手写</h2>
+    <h2 class="sec">随手写</h2>
 
     <div class="note">
       <div class="date">2026-09-10</div>
       <h3>建了个站</h3>
       <p>
-        终于把自己的网站搭起来了。以后做完的东西就往这儿放，
-        不用再翻聊天记录找截图了。
+        以前做完的东西都散在文件夹里，想给人看只能翻聊天记录找截图。
+        现在有地方放了——纯静态页面，改完 HTML 推上去就更新，没有后台、没有数据库、不用管服务器。
       </p>
     </div>
 
     <div class="note">
-      <div class="date">2026-09-01</div>
-      <h3>带图的一条</h3>
-      <p>图片放进 images 文件夹，然后像下面这样引用就行：</p>
-      <img src="images/placeholder.svg" alt="示意图">
+      <div class="date">2026-08</div>
+      <h3>给桌宠拍了个演示片</h3>
+      <p>
+        录屏这事最麻烦的不是剪，是「每次都得记得先干嘛后干嘛」。
+        所以把每个镜头写成了一个 .bat：双击 → 屏幕上告诉我这条要做什么动作 → 倒数五秒 → 开录 → 到点自动停。
+        重录不覆盖，自动存成 _2、_3，敢多拍几遍。
+      </p>
+      <p>
+        成片在 <a href="projects/deskpet.html">桌宠那一页</a>。
+      </p>
     </div>
 
   </section>
 
   <footer>
-    © 2026 Colorful-white
+    <span>© 2026 Colorful-white</span>
+    <span><a href="https://github.com/Colorful-white/Colorful-white.github.io">本站源码</a></span>
   </footer>
 
 </div>

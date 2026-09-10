@@ -1,31 +1,31 @@
-# 我的小站
+# Colorful-white 的小站
+
+线上地址：https://colorful-white.github.io
 
 ## 本地预览
-双击 `index.html`，浏览器打开就能看。改完文件刷新页面（F5）即可。
+双击 `index.html` 就能看。改完文件刷新页面（F5）即可。
 
 ## 文件说明
 ```
-site/
-├── index.html          首页（自我介绍、作品列表、随手写）
-├── style.css           所有页面共用的样式，改颜色/字号来这儿
-├── images/             图片都放这里
-└── projects/
-    └── deskpet.html    作品详情页，加新作品就复制这个文件改
+index.html                 首页：介绍 + 作品卡片 + 随手写
+style.css                  所有页面共用的样式，改配色/字号来这儿
+images/                    图片
+videos/deskpet-demo.mp4    桌宠演示片（16MB，页面上默认不加载，点播放才下载）
+projects/
+  deskpet.html             桌宠详情页
+  sw-workflow.html         SolidWorks 建模详情页
 ```
 
 ## 常见改动
-- **换名字/介绍** → `index.html` 里 `<header class="site-head">` 那一块
-- **加作品** → `index.html` 里复制一整块 `<a class="card">…</a>`，再复制 `projects/deskpet.html` 改成新页面
-- **加图片** → 图片丢进 `images/`，用 `<img src="images/文件名.png" alt="说明">` 引用
-- **换配色** → `style.css` 最上面 `:root` 里的颜色值
+- **改介绍** → `index.html` 里 `<header class="site-head">` 那一块
+- **加作品** → 复制一整块 `<a class="card">…</a>`，再复制一个 `projects/*.html` 改内容
+- **主推作品** → 卡片上加 `card--feature` 类，它就占满一行、图文横排
+- **像素图** → 图片加 `thumb--pixel` / `pixel` 类，放大后保持硬边不发糊
+- **加图片** → 丢进 `images/`，用 `<img src="images/xxx.png" alt="说明">` 引用
+- **换配色** → `style.css` 最上面 `:root` 里的色值（深色模式在下面那块）
 
-## 上线（GitHub Pages）
-1. 注册 GitHub，新建仓库，名字取 `你的用户名.github.io`，选 Public
-2. 把 `site/` 里的**所有文件**传上去（注意是里面的文件，不是 site 文件夹本身）
-3. 仓库 Settings → Pages → Branch 选 `main` → Save
-4. 等 1~2 分钟，访问 `https://你的用户名.github.io`
-
-以后更新：
+## 更新上线
 ```bash
 git add -A && git commit -m "update" && git push
 ```
+推完等 1 分钟左右生效。
