@@ -39,6 +39,27 @@ body {
 }
 
 .wrap { max-width: 820px; margin: 0 auto; padding: 72px 24px 100px; }
+/* 首页要放侧栏，宽一点；详情页保持 820 的阅读宽度 */
+.wrap--home { max-width: 1060px; }
+
+/* ---------- 首页两栏：作品在左，随手写在右 ---------- */
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 290px; gap: 60px; align-items: start; }
+.layout > main > section:last-child,
+.layout > aside > section:last-child { margin-bottom: 0; }
+
+/* 侧栏跟着滚，滚到底就停住 */
+.side { position: sticky; top: 40px; }
+.side .note { padding-bottom: 24px; margin-bottom: 24px; }
+.side .note h3 { font-size: 16px; margin: 3px 0 8px; }
+.side .note p { font-size: 14px; line-height: 1.75; margin-bottom: 10px; }
+.side .note .date { font-size: 12px; }
+
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; gap: 0; }
+  .side { position: static; }
+  .side .note h3 { font-size: 19px; }
+  .side .note p { font-size: 16px; line-height: 1.8; }
+}
 
 a { color: var(--accent); text-underline-offset: 3px; }
 img, video { max-width: 100%; }
@@ -96,7 +117,7 @@ section { margin-bottom: 72px; }
 /* 主推作品：宽屏横排，窄屏自动变竖排 */
 .card--feature { grid-column: 1 / -1; }
 @media (min-width: 640px) {
-  .card--feature { display: grid; grid-template-columns: 300px 1fr; }
+  .card--feature { display: grid; grid-template-columns: 260px 1fr; }
   .card--feature .thumb { height: 100%; aspect-ratio: auto; min-height: 210px; }
   .card--feature .body { padding: 26px 28px; align-self: center; }
   .card--feature h3 { font-size: 21px; }
