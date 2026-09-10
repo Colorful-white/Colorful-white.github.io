@@ -62,40 +62,13 @@
     </div>
 
     <h2>踩过的坑</h2>
-    <p>
-      SolidWorks 的 COM 接口是给 VBA 设计的，用 Python 晚绑定调它，
-      文档上写得通顺的地方实际全是雷。基础层里每一条注释都是实测换来的：
-    </p>
-
-    <div class="pit">
-      <h3>SaveAs3 的返回值不可信</h3>
-      <p>
-        它说保存成功不一定真落盘了。判断成败只能去看文件在不在硬盘上。
-      </p>
-    </div>
-
-    <div class="pit">
-      <h3>Callout 参数不能传 None</h3>
-      <p>
-        必须传一个 VT_DISPATCH 的空指针。传 Python 的 <code>None</code> 会直接炸。
-      </p>
-    </div>
-
-    <div class="pit">
-      <h3>中文版的默认模板路径指向一个不存在的文件</h3>
-      <p>
-        默认模板偏好指向 <code>零件.prtdot</code>，而这个文件并不在那儿。只能自己回退扫描去找。
-      </p>
-    </div>
-
-    <div class="pit">
-      <h3>版本之间接口会消失</h3>
-      <p>
-        <code>CreateMassProperty</code> 在 SW2023 上已经不能用了，得改走
-        <code>Extension.GetMassProperties2</code>。另外
-        <code>RevisionNumber</code>、<code>GetTitle</code> 这些在晚绑定下是属性不是方法，当方法调就报错。
-      </p>
-    </div>
+    <p class="tight">COM 接口是给 VBA 设计的，用 Python 晚绑定调，文档写得通顺的地方全是雷：</p>
+    <ul class="pits">
+      <li><b>SaveAs3 的返回值不可信</b>——它说成功也可能没落盘，只能查文件在不在。</li>
+      <li><b>Callout 参数不能传 <code>None</code></b>——得传 VT_DISPATCH 空指针，否则直接炸。</li>
+      <li><b>中文版默认模板指向一个不存在的文件</b>（<code>零件.prtdot</code>）——只能回退扫描自己找。</li>
+      <li><b>接口会随版本消失</b>——<code>CreateMassProperty</code> 在 SW2023 没了，改用 <code>Extension.GetMassProperties2</code>；<code>RevisionNumber</code>、<code>GetTitle</code> 晚绑定下是属性不是方法。</li>
+    </ul>
 
     <h2>单位这件事单独说</h2>
     <p>

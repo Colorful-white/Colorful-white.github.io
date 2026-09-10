@@ -199,17 +199,21 @@ article table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
 article th, article td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
 article th { color: var(--muted); font-weight: 600; font-size: 13px; white-space: nowrap; }
 
-/* 「踩过的坑」高亮块 */
-.pit {
+/* 「踩过的坑」紧凑列表：一条一行，别占太多版面 */
+.pits {
+  list-style: none;
+  margin: 0 0 20px;
+  padding: 6px 20px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-left: 3px solid var(--accent);
   border-radius: 0 12px 12px 0;
-  padding: 18px 20px;
-  margin: 0 0 18px;
+  font-size: 14.5px;
 }
-.pit h3 { margin: 0 0 8px; font-size: 16px; }
-.pit p:last-child { margin-bottom: 0; }
+.pits li { padding: 11px 0; line-height: 1.7; border-bottom: 1px solid var(--border); }
+.pits li:last-child { border-bottom: 0; }
+.pits b { font-weight: 600; }
+article p.tight { margin-bottom: 12px; }
 
 /* ---------- 页脚 ---------- */
 footer {

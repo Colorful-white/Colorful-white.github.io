@@ -10,7 +10,6 @@
 index.html                 首页：介绍 + 作品卡片 + 随手写
 style.css                  所有页面共用的样式，改配色/字号来这儿
 images/                    图片
-videos/deskpet-demo.mp4    桌宠演示片（16MB，页面上默认不加载，点播放才下载）
 projects/
   deskpet.html             桌宠详情页
   sw-workflow.html         SolidWorks 建模详情页
