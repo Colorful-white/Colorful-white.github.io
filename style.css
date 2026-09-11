@@ -186,8 +186,20 @@ article figure { margin: 28px 0; }
 article figure img, article figure video { width: 100%; display: block; border-radius: 12px; border: 1px solid var(--border); background: var(--thumb-bg); }
 article figure img.pixel { image-rendering: pixelated; }
 article figcaption { font-size: 13px; color: var(--muted); text-align: center; margin-top: 10px; }
+/* 手机截图并排：竖图一张就能占满屏，必须缩小并排放 */
+.shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; align-items: start; max-width: 460px; margin: 0 auto; }
+.shots img {
+  width: 100%;
+  display: block;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--thumb-bg);
+}
+
+
 /* 原图不够大的截图别硬撑满宽度，会糊 */
 figure.narrow { max-width: 680px; margin-left: auto; margin-right: auto; }
+figure.narrow--phone { max-width: 460px; }
 article video { background: #000; }
 
 /* B 站播放器：16:9 自适应，窄屏也不会溢出 */
