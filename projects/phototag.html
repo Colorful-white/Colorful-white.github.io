@@ -4,11 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PhotoTag — Budroval</title>
-<meta name="description" content="PhotoTag —— 做过的一个项目，这一页随进展更新。">
+<meta name="description" content="给手机里的图片打标签，再按标签找回来。安卓 App，完全离线。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐾</text></svg>">
 <meta property="og:type" content="article">
 <meta property="og:title" content="PhotoTag">
-<meta property="og:description" content="PhotoTag —— 做过的一个项目，这一页随进展更新。">
+<meta property="og:description" content="给手机里的图片打标签，再按标签找回来。安卓 App，完全离线。">
+<meta property="og:image" content="https://colorful-white.github.io/images/phototag-icon.png">
 <link rel="stylesheet" href="../style.css">
 </head>
 <body>
@@ -19,20 +20,47 @@
   <article>
     <h1>PhotoTag</h1>
 
-    <!-- ↓ 这段换成一两句话说清楚它是什么、解决什么问题 -->
-    <p class="lede">之前做的一个项目，这一页跟着进度更新。</p>
+    <p class="lede">
+      一个安卓 App：给图片打标签，然后按标签找回来。
+      图一多就没法翻的场景都适用——旅行照片按目的地和年份归类，二次元图按角色名整理，
+      资料截图、表情包、灵感素材按主题分。
+    </p>
 
-    <!-- ↓ 有截图了就把下面这块的注释去掉，图片放进 ../images/
-    <figure>
-      <img src="../images/文件名.png" alt="说明">
-      <figcaption>图片下面的小字说明</figcaption>
+    <figure class="narrow">
+      <img class="icon-shot" src="../images/phototag-icon.png" alt="PhotoTag 应用图标">
     </figure>
-    -->
+
+    <h2>怎么用</h2>
+    <div class="table-scroll">
+    <table>
+      <tr><th>导入</th><td>底部「导入图片」从相册多选。选中的图会<strong>复制一份进 App</strong>，原图以后删了也不影响这边</td></tr>
+      <tr><th>打标签</th><td>点开任意图片进全屏预览，点「标签」添加；一张图能加多个，已有的标签点一下就删</td></tr>
+      <tr><th>搜索</th><td>顶部搜索框输标签词筛选</td></tr>
+      <tr><th>批量</th><td>长按图片或点「多选」进入多选模式，一次给多张打同一个标签，也能批量删</td></tr>
+      <tr><th>删除</th><td>全屏预览里点「删除」删单张；多选模式下批量删</td></tr>
+    </table>
+    </div>
+
+    <h2>搜索是怎么匹配的</h2>
+    <ul>
+      <li><strong>单个词模糊匹配</strong>——输「巴」能搜到「巴黎」</li>
+      <li><strong>多个词空格隔开取交集</strong>——输「巴黎 2024」只显示同时有这两个标签的图</li>
+    </ul>
+
+    <h2>怎么做的</h2>
+    <p>
+      Kotlin + Jetpack Compose（Material 3）写的界面，标签和图片的对应关系存在
+      Room（SQLite）本地数据库里。
+    </p>
+    <p>
+      <strong>整个 App 不联网</strong>——连网络权限都没申请，所以图片和标签只待在你自己手机上，
+      传不出去也同步不了。
+    </p>
 
     <h2>进展</h2>
-    <!-- 有推进就在最上面加一条 <li>，日期用 2026-09-11 这种写法 -->
     <ol class="log">
       <li><span class="log-date">2026-09-11</span><div>开了这一页。</div></li>
+      <li><span class="log-date">2026-08</span><div>第一个能装的版本，导入、打标签、搜索、批量操作、删除都能用了。</div></li>
     </ol>
   </article>
 

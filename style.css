@@ -107,6 +107,10 @@ section { margin-bottom: 72px; }
   object-fit: cover;
   background: var(--thumb-bg);
 }
+/* App 图标这类小方图：居中留白，别被裁 */
+.thumb--icon { object-fit: contain; padding: 26px; }
+.icon-shot { width: 160px !important; height: 160px; margin: 0 auto; display: block; border-radius: 22px; }
+
 /* 像素图专用：放大后保持硬边，不被浏览器抹糊 */
 .thumb--pixel { image-rendering: pixelated; object-fit: contain; padding: 8px; }
 
