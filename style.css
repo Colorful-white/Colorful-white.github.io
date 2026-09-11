@@ -238,7 +238,7 @@ article table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
 article th, article td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
 article th { color: var(--muted); font-weight: 600; font-size: 13px; white-space: nowrap; }
 
-/* 「踩过的坑」紧凑列表：一条一行，别占太多版面 */
+/* 「踩过的坑」紧凑列表（SolidWorks 那页删了，暂时没人用，留着备用） */
 .pits {
   list-style: none;
   margin: 0 0 20px;

@@ -12,7 +12,9 @@ style.css                  所有页面共用的样式，改配色/字号来这�
 images/                    图片
 projects/
   deskpet.html             桌宠详情页
-  sw-workflow.html         SolidWorks 建模详情页
+  phototag.html            PhotoTag 详情页
+  embedded.html            嵌入式开发（待填）
+  football.html            足球联机小游戏（待填）
 ```
 
 ## 常见改动
