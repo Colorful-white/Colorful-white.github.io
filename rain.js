@@ -148,7 +148,7 @@
 
     // 水痕慢慢干掉
     tx.globalCompositeOperation = 'destination-out';
-    tx.fillStyle = 'rgba(0,0,0,.005)';
+    tx.fillStyle = 'rgba(0,0,0,.016)';
     tx.fillRect(0, 0, GW, GH);
     tx.globalCompositeOperation = 'source-over';
 
@@ -170,7 +170,7 @@
       r.y += r.v;
       r.x += Math.sin(r.wob) * .09;                  // 只剩一丝丝摆动
 
-      tx.fillStyle = 'rgba(176,214,255,.42)';
+      tx.fillStyle = 'rgba(150,190,235,.10)';
       tx.beginPath();
       tx.arc(r.x, r.y, Math.max(.6, r.r * .42), 0, 6.284);
       tx.fill();
@@ -185,34 +185,51 @@
       if (r.y > GH + 10) runners.splice(j, 1);
     }
 
-    // 玻璃本身完全透明，不铺任何底色——那层白雾就是从这儿来的
+    // 玻璃本身完全透明。合成方式用普通的 source-over——
+    // 之前用 lighter（叠加发光），几百颗水珠的光加在一起就成了一块白板
     gx.clearRect(0, 0, GW, GH);
-    gx.globalCompositeOperation = 'lighter';
+    gx.globalAlpha = .5;
     gx.drawImage(trail, 0, 0, GW, GH);
+    gx.globalAlpha = 1;
 
     for (var m = 0; m < stuck.length; m++) {
       var s = stuck[m];
       s.r += .004;                                 // 慢慢积大，直到够重
-      var rg = gx.createRadialGradient(s.x - s.r * .3, s.y - s.r * .3, 0, s.x, s.y, s.r * 1.8);
-      rg.addColorStop(0, 'rgba(215,238,255,' + (s.a * .9) + ')');
-      rg.addColorStop(.6, 'rgba(150,200,255,' + (s.a * .25) + ')');
-      rg.addColorStop(1, 'rgba(120,170,235,0)');
+      // 水珠像一颗小透镜：中心把背后压暗，只有下缘挂住一点点光
+      var rg = gx.createRadialGradient(s.x, s.y - s.r * .2, s.r * .1, s.x, s.y, s.r * 1.35);
+      rg.addColorStop(0,   'rgba(4,8,16,' + (s.a * .55) + ')');
+      rg.addColorStop(.72, 'rgba(6,11,20,' + (s.a * .3) + ')');
+      rg.addColorStop(1,   'rgba(8,14,26,0)');
       gx.fillStyle = rg;
       gx.beginPath();
-      gx.arc(s.x, s.y, s.r * 1.8, 0, 6.284);
+      gx.arc(s.x, s.y, s.r * 1.35, 0, 6.284);
       gx.fill();
+
+      if (s.r > 1.2) {
+        gx.strokeStyle = 'rgba(180,212,250,' + (s.a * .16) + ')';
+        gx.lineWidth = .6;
+        gx.beginPath();
+        gx.arc(s.x, s.y, s.r * .95, .55, 2.35);      // 只画下缘那一段弧
+        gx.stroke();
+      }
     }
 
     for (var n2 = 0; n2 < runners.length; n2++) {
       var rr = runners[n2];
-      var rg2 = gx.createRadialGradient(rr.x - rr.r * .3, rr.y - rr.r * .4, 0, rr.x, rr.y, rr.r * 2);
-      rg2.addColorStop(0, 'rgba(220,240,255,.6)');
-      rg2.addColorStop(.55, 'rgba(160,208,255,.3)');
-      rg2.addColorStop(1, 'rgba(120,170,235,0)');
+      var rg2 = gx.createRadialGradient(rr.x, rr.y - rr.r * .3, rr.r * .1, rr.x, rr.y, rr.r * 1.6);
+      rg2.addColorStop(0,   'rgba(4,8,16,.5)');
+      rg2.addColorStop(.72, 'rgba(6,11,20,.28)');
+      rg2.addColorStop(1,   'rgba(8,14,26,0)');
       gx.fillStyle = rg2;
       gx.beginPath();
-      gx.ellipse(rr.x, rr.y, rr.r * 1.6, rr.r * 2.1, 0, 0, 6.284);
+      gx.ellipse(rr.x, rr.y, rr.r * 1.3, rr.r * 1.7, 0, 0, 6.284);
       gx.fill();
+
+      gx.strokeStyle = 'rgba(185,215,250,.20)';
+      gx.lineWidth = .7;
+      gx.beginPath();
+      gx.arc(rr.x, rr.y, rr.r * 1.05, .5, 2.4);
+      gx.stroke();
     }
     gx.globalCompositeOperation = 'source-over';
   }

@@ -56,6 +56,7 @@ img, video { max-width: 100%; }
   /* 只留一点点侧角。斜太多的话，水痕会被透视拉歪，看着别扭 */
   transform: perspective(1100px) rotateY(10deg);
   transform-origin: 50% 50%;
+  opacity: .7;          /* 宁可看不清，也不要糊成一块白板 */
 }
 
 /* 详情页：只有地上的水波 */
