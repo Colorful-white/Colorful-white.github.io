@@ -140,10 +140,11 @@ section { margin-bottom: 72px; }
 /* 还没有封面图的卡片：不留空图位，也别被同行的图片卡撑高 */
 .card--text { align-self: start; }
 .card--text .body { padding: 20px 20px 22px; }
+/* 卡片上的「最近更新」，同上，备用 */
 .card .updated { margin-top: 12px; font-size: 12.5px; color: var(--muted); }
 .card .updated::before { content: "●"; color: var(--accent); font-size: 9px; vertical-align: 2px; margin-right: 6px; }
 
-/* ---------- 进展时间线 ---------- */
+/* ---------- 进展时间线（暂时没有页面在用，留着备用） ---------- */
 .log { list-style: none; padding: 0; margin: 0 0 20px; }
 .log li {
   display: grid;
