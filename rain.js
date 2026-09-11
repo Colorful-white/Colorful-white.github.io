@@ -148,7 +148,7 @@
 
     // 水痕慢慢干掉
     tx.globalCompositeOperation = 'destination-out';
-    tx.fillStyle = 'rgba(0,0,0,.0065)';
+    tx.fillStyle = 'rgba(0,0,0,.005)';
     tx.fillRect(0, 0, GW, GH);
     tx.globalCompositeOperation = 'source-over';
 
@@ -165,14 +165,14 @@
     // 往下滑：留水痕、吃掉路过的小水珠、越滑越快
     for (var j = runners.length - 1; j >= 0; j--) {
       var r = runners[j];
-      r.v += .035 + r.r * .006;
-      r.wob += .12;
+      r.v = Math.min(3.2, r.v + .028 + r.r * .004);   // 加速但有上限，不会越掉越野
+      r.wob += .045;
       r.y += r.v;
-      r.x += Math.sin(r.wob) * .35;
+      r.x += Math.sin(r.wob) * .09;                  // 只剩一丝丝摆动
 
-      tx.fillStyle = 'rgba(182,218,255,.62)';
+      tx.fillStyle = 'rgba(176,214,255,.42)';
       tx.beginPath();
-      tx.arc(r.x, r.y, Math.max(.45, r.r * .3), 0, 6.284);
+      tx.arc(r.x, r.y, Math.max(.6, r.r * .42), 0, 6.284);
       tx.fill();
 
       for (var k = stuck.length - 1; k >= 0; k--) {
@@ -185,22 +185,8 @@
       if (r.y > GH + 10) runners.splice(j, 1);
     }
 
+    // 玻璃本身完全透明，不铺任何底色——那层白雾就是从这儿来的
     gx.clearRect(0, 0, GW, GH);
-
-    // 玻璃本身：近的一侧亮、远的一侧暗，才看得出是立着的一块板
-    var g = gx.createLinearGradient(0, 0, GW, 0);
-    g.addColorStop(0,   'rgba(150,195,250,.052)');
-    g.addColorStop(.45, 'rgba(120,170,235,.018)');
-    g.addColorStop(1,   'rgba(90,140,210,.006)');
-    gx.fillStyle = g;
-    gx.fillRect(0, 0, GW, GH);
-
-    var edge = gx.createLinearGradient(0, 0, 14, 0);
-    edge.addColorStop(0, 'rgba(190,225,255,.20)');
-    edge.addColorStop(1, 'rgba(190,225,255,0)');
-    gx.fillStyle = edge;
-    gx.fillRect(0, 0, 14, GH);
-
     gx.globalCompositeOperation = 'lighter';
     gx.drawImage(trail, 0, 0, GW, GH);
 
@@ -220,7 +206,7 @@
     for (var n2 = 0; n2 < runners.length; n2++) {
       var rr = runners[n2];
       var rg2 = gx.createRadialGradient(rr.x - rr.r * .3, rr.y - rr.r * .4, 0, rr.x, rr.y, rr.r * 2);
-      rg2.addColorStop(0, 'rgba(225,244,255,.85)');
+      rg2.addColorStop(0, 'rgba(220,240,255,.6)');
       rg2.addColorStop(.55, 'rgba(160,208,255,.3)');
       rg2.addColorStop(1, 'rgba(120,170,235,0)');
       gx.fillStyle = rg2;
