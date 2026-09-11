@@ -1,33 +1,24 @@
 /* ============================================================
-   配色 —— 浅色为默认，系统深色模式自动切换
-   想换风格改这十来个色值就行，别的地方都用变量
+   雨夜配色。这套是定死的暗色，不跟随系统——
+   雨和水波在浅色背景上根本看不见
    ============================================================ */
 :root {
-  --bg: #fbfaf8;
-  --surface: #ffffff;
-  --border: #e7e2da;
-  --text: #22201d;
-  --muted: #6f6a63;
-  --accent: #b4593a;
-  --shadow: 0 1px 2px rgba(0,0,0,.05), 0 10px 30px rgba(0,0,0,.06);
-  --thumb-bg: #f2efe9;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #15141a;
-    --surface: #1d1c23;
-    --border: #302e39;
-    --text: #e9e6e1;
-    --muted: #9b958d;
-    --accent: #e28a60;
-    --shadow: 0 1px 2px rgba(0,0,0,.35), 0 10px 30px rgba(0,0,0,.3);
-    --thumb-bg: #26242c;
-  }
+  color-scheme: dark;
+  --bg: #04070d;
+  --surface: rgba(10, 17, 32, .5);
+  --surface-solid: #0b1220;
+  --border: rgba(150, 190, 255, .14);
+  --border-lit: rgba(160, 210, 255, .45);
+  --text: #e9f1ff;
+  --muted: #92a8c8;
+  --dim: #7d93b4;
+  --accent: #9cc6ff;
+  --thumb-bg: #0a1120;
 }
 
 * { box-sizing: border-box; }
-
 html { scroll-behavior: smooth; }
+html, body { min-height: 100%; }
 
 body {
   margin: 0;
@@ -36,18 +27,79 @@ body {
   font: 16px/1.8 "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  overflow-x: hidden;
 }
 
-.wrap { max-width: 820px; margin: 0 auto; padding: 72px 24px 100px; }
-/* 首页要放侧栏，宽一点；详情页保持 820 的阅读宽度 */
-.wrap--home { max-width: 1060px; }
+a { color: var(--accent); text-underline-offset: 3px; }
+img, video { max-width: 100%; }
 
-/* ---------- 首页两栏：作品在左，随手写在右 ---------- */
-.layout { display: grid; grid-template-columns: minmax(0, 1fr) 290px; gap: 60px; align-items: start; }
+/* ============================================================
+   背景层：雨、玻璃、水波。全部 fixed 且不接收鼠标
+   ============================================================ */
+
+/* 首页：光从下面漫上来 */
+.glow {
+  position: fixed; left: 50%; bottom: -14vh; transform: translateX(-50%);
+  width: 160%; height: 62vh; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 100%, rgba(150,195,245,.42), rgba(95,150,215,.16) 38%, transparent 68%),
+    radial-gradient(ellipse at 50% 100%, rgba(190,220,255,.30), transparent 26%);
+  filter: blur(30px);
+}
+#far, #near { position: fixed; inset: 0; pointer-events: none; }
+#far  { z-index: 1; filter: blur(2.6px); opacity: .85; }   /* 远景糊掉 = 隔着东西看 */
+#near { z-index: 2; }
+
+/* 两栏中间那块斜着的玻璃，位置由 rain.js 算 */
+#glass {
+  position: fixed; top: 0; z-index: 3; pointer-events: none;
+  transform: perspective(760px) rotateY(26deg);
+  transform-origin: 50% 50%;
+}
+
+/* 详情页：只有地上的水波 */
+#water { position: fixed; left: 0; right: 0; bottom: 0; height: 42vh; z-index: 1; pointer-events: none; }
+
+/* 压暗顶部，别让雨压过标题 */
+.veil {
+  position: fixed; inset: 0; z-index: 4; pointer-events: none;
+  background: linear-gradient(to bottom, rgba(4,7,13,.5) 0%, transparent 20%);
+}
+.veil--page {
+  background:
+    linear-gradient(to bottom, rgba(4,7,13,.55) 0%, transparent 18%),
+    linear-gradient(to bottom, transparent 58%, rgba(4,7,13,.72) 90%);
+}
+
+/* ============================================================
+   版心
+   ============================================================ */
+.wrap { position: relative; z-index: 5; max-width: 820px; margin: 0 auto; padding: 72px 24px 100px; }
+.wrap--home { max-width: 1080px; padding-top: 18vh; }
+
+/* ---------- 页头 ---------- */
+.site-head { margin-bottom: 80px; }
+.site-head h1 {
+  font-size: 40px; line-height: 1.3; margin: 0 0 14px; letter-spacing: -.5px;
+  text-shadow: 0 0 40px rgba(120,175,245,.3);
+}
+.site-head .lede { color: var(--muted); margin: 0 0 22px; max-width: 46ch; font-size: 17px; }
+.links { display: flex; flex-wrap: wrap; gap: 20px; font-size: 14px; }
+.links a { text-decoration: none; border-bottom: 1px solid transparent; padding-bottom: 2px; }
+.links a:hover { border-bottom-color: var(--accent); }
+
+/* ---------- 区块标题 ---------- */
+h2.sec {
+  font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--dim);
+  font-weight: 600; margin: 0 0 24px; padding-bottom: 12px; border-bottom: 1px solid var(--border);
+}
+section { margin-bottom: 72px; }
+
+/* ---------- 首页两栏：作品在左，随手写在右，中间留给玻璃 ---------- */
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 150px; align-items: start; }
 .layout > main > section:last-child,
 .layout > aside > section:last-child { margin-bottom: 0; }
 
-/* 侧栏跟着滚，滚到底就停住 */
 .side { position: sticky; top: 40px; }
 .side .note { padding-bottom: 24px; margin-bottom: 24px; }
 .side .note h3 { font-size: 16px; margin: 3px 0 8px; }
@@ -59,66 +111,36 @@ body {
   .side { position: static; }
   .side .note h3 { font-size: 19px; }
   .side .note p { font-size: 16px; line-height: 1.8; }
+  #glass { display: none; }
 }
-
-a { color: var(--accent); text-underline-offset: 3px; }
-img, video { max-width: 100%; }
-
-/* ---------- 页头 ---------- */
-.site-head { margin-bottom: 72px; }
-.site-head h1 { font-size: 36px; line-height: 1.3; margin: 0 0 14px; letter-spacing: -.5px; }
-.site-head .lede { color: var(--muted); margin: 0 0 22px; max-width: 46ch; }
-.links { display: flex; flex-wrap: wrap; gap: 20px; font-size: 14px; }
-.links a { text-decoration: none; border-bottom: 1px solid transparent; padding-bottom: 2px; }
-.links a:hover { border-bottom-color: var(--accent); }
-
-/* ---------- 区块标题 ---------- */
-h2.sec {
-  font-size: 12px;
-  letter-spacing: .16em;
-  text-transform: uppercase;
-  color: var(--muted);
-  font-weight: 600;
-  margin: 0 0 24px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border);
-}
-section { margin-bottom: 72px; }
 
 /* ---------- 作品卡片 ---------- */
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 22px; }
 
 .card {
-  display: block;
-  text-decoration: none;
-  color: inherit;
+  display: block; text-decoration: none; color: inherit;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 14px;
   overflow: hidden;
-  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+  backdrop-filter: blur(8px);
+  transition: transform .2s ease, border-color .2s ease, background .2s ease;
 }
-.card:hover { transform: translateY(-3px); box-shadow: var(--shadow); border-color: var(--accent); }
+.card:hover { transform: translateY(-3px); border-color: var(--border-lit); background: rgba(14,24,46,.6); }
 
-.card .thumb {
-  display: block;
-  width: 100%;
-  aspect-ratio: 16 / 10;
-  object-fit: cover;
-  background: var(--thumb-bg);
-}
-/* App 图标这类小方图：居中留白，别被裁 */
-.thumb--icon { object-fit: contain; padding: 26px; }
-.icon-shot { width: 160px !important; height: 160px; margin: 0 auto; display: block; border-radius: 22px; }
-
-/* 像素图专用：放大后保持硬边，不被浏览器抹糊 */
+.card .thumb { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; background: var(--thumb-bg); }
 .thumb--pixel { image-rendering: pixelated; object-fit: contain; padding: 8px; }
+.thumb--icon { object-fit: contain; padding: 26px; }
 
 .card .body { padding: 16px 18px 20px; }
 .card h3 { margin: 0 0 8px; font-size: 18px; }
 .card p { margin: 0; font-size: 14.5px; color: var(--muted); line-height: 1.7; }
 
-/* 主推作品：宽屏横排，窄屏自动变竖排 */
+/* 没有封面图的卡片：不留空图位，也别被同行的图片卡撑高 */
+.card--text { align-self: start; }
+.card--text .body { padding: 20px 20px 22px; }
+
+/* 主推作品：宽屏图文横排 */
 .card--feature { grid-column: 1 / -1; }
 @media (min-width: 640px) {
   .card--feature { display: grid; grid-template-columns: 260px 1fr; }
@@ -128,44 +150,18 @@ section { margin-bottom: 72px; }
 }
 
 .tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
-.tag {
-  font-size: 12px;
-  color: var(--muted);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 2px 10px;
-  line-height: 1.7;
-}
+.tag { font-size: 12px; color: var(--muted); border: 1px solid var(--border); border-radius: 999px; padding: 2px 10px; line-height: 1.7; }
 
-/* 还没有封面图的卡片：不留空图位，也别被同行的图片卡撑高 */
-.card--text { align-self: start; }
-.card--text .body { padding: 20px 20px 22px; }
-/* 卡片上的「最近更新」，同上，备用 */
+/* 卡片上的「最近更新」，暂时没在用，留着备用 */
 .card .updated { margin-top: 12px; font-size: 12.5px; color: var(--muted); }
 .card .updated::before { content: "●"; color: var(--accent); font-size: 9px; vertical-align: 2px; margin-right: 6px; }
-
-/* ---------- 进展时间线（暂时没有页面在用，留着备用） ---------- */
-.log { list-style: none; padding: 0; margin: 0 0 20px; }
-.log li {
-  display: grid;
-  grid-template-columns: 92px 1fr;
-  gap: 18px;
-  padding: 13px 0;
-  border-bottom: 1px solid var(--border);
-}
-.log li:last-child { border-bottom: 0; }
-.log-date { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
-.log li div { line-height: 1.75; }
-@media (max-width: 520px) {
-  .log li { grid-template-columns: 1fr; gap: 3px; }
-}
 
 /* ---------- 随手写 ---------- */
 .note { padding-bottom: 32px; margin-bottom: 32px; border-bottom: 1px solid var(--border); }
 .note:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom: 0; }
-.note .date { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.note .date { font-size: 13px; color: var(--dim); font-variant-numeric: tabular-nums; }
 .note h3 { margin: 4px 0 10px; font-size: 19px; }
-.note p { margin: 0 0 14px; }
+.note p { margin: 0 0 14px; color: var(--muted); }
 .note p:last-child { margin-bottom: 0; }
 .note img { width: 100%; border-radius: 10px; border: 1px solid var(--border); background: var(--thumb-bg); }
 
@@ -174,102 +170,81 @@ section { margin-bottom: 72px; }
 .back:hover { text-decoration: underline; }
 
 article h1 { font-size: 32px; margin: 0 0 10px; letter-spacing: -.5px; line-height: 1.3; }
-article .meta { color: var(--muted); font-size: 14px; margin: 0 0 8px; }
-article .lede { font-size: 17px; margin: 0 0 36px; }
+article .lede { font-size: 17px; margin: 0 0 36px; color: #c3d3ea; }
 article h2 { font-size: 20px; margin: 48px 0 14px; letter-spacing: -.2px; }
 article h3 { font-size: 16px; margin: 28px 0 8px; }
-article p { margin: 0 0 16px; }
-article ul { padding-left: 1.25em; margin: 0 0 16px; }
+article p { margin: 0 0 16px; color: #c3d3ea; }
+article ul { padding-left: 1.25em; margin: 0 0 16px; color: #c3d3ea; }
 article li { margin-bottom: 8px; }
-article strong { font-weight: 600; }
+article strong { font-weight: 600; color: var(--text); }
 
 article figure { margin: 28px 0; }
-article figure img, article figure video { width: 100%; display: block; border-radius: 12px; border: 1px solid var(--border); background: var(--thumb-bg); }
-article figure img.pixel { image-rendering: pixelated; }
-article figcaption { font-size: 13px; color: var(--muted); text-align: center; margin-top: 10px; }
-/* 手机截图并排：竖图一张就能占满屏，必须缩小并排放 */
-.shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; align-items: start; max-width: 460px; margin: 0 auto; }
-.shots img {
-  width: 100%;
-  display: block;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--thumb-bg);
+article figure img, article figure video {
+  width: 100%; display: block; border-radius: 12px;
+  border: 1px solid var(--border); background: var(--thumb-bg);
 }
-
+article figure img.pixel { image-rendering: pixelated; }
+article figcaption { font-size: 13px; color: var(--dim); text-align: center; margin-top: 10px; }
+article video { background: #000; }
 
 /* 原图不够大的截图别硬撑满宽度，会糊 */
 figure.narrow { max-width: 680px; margin-left: auto; margin-right: auto; }
 figure.narrow--phone { max-width: 460px; }
-article video { background: #000; }
 
-/* B 站播放器：16:9 自适应，窄屏也不会溢出 */
-.ratio {
-  position: relative;
-  aspect-ratio: 16 / 9;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-  background: #000;
-}
+/* 手机截图并排：竖图一张就能占满屏 */
+.shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; align-items: start; max-width: 460px; margin: 0 auto; }
+.shots img { width: 100%; display: block; border: 1px solid var(--border); border-radius: 10px; background: var(--thumb-bg); }
+
+/* B 站播放器：16:9 自适应 */
+.ratio { position: relative; aspect-ratio: 16 / 9; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: #000; }
 .ratio iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 
 article code {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  padding: 1px 6px;
-  font-size: .88em;
-  font-family: "Cascadia Mono", Consolas, monospace;
+  background: rgba(20,32,56,.7); border: 1px solid var(--border); border-radius: 5px;
+  padding: 1px 6px; font-size: .88em; font-family: "Cascadia Mono", Consolas, monospace;
 }
 article pre {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px 18px;
-  overflow-x: auto;
-  line-height: 1.6;
+  background: rgba(8,14,26,.75); border: 1px solid var(--border); border-radius: 12px;
+  padding: 16px 18px; overflow-x: auto; line-height: 1.6;
 }
 article pre code { border: 0; background: none; padding: 0; }
 
 /* 表格：窄屏可横向滚动 */
 .table-scroll { overflow-x: auto; margin: 0 0 20px; }
 article table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
-article th, article td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
-article th { color: var(--muted); font-weight: 600; font-size: 13px; white-space: nowrap; }
+article th, article td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--border); vertical-align: top; color: #bacbe4; }
+article th { color: var(--dim); font-weight: 600; font-size: 13px; white-space: nowrap; }
 
 /* 「踩过的坑」紧凑列表（SolidWorks 那页删了，暂时没人用，留着备用） */
 .pits {
-  list-style: none;
-  margin: 0 0 20px;
-  padding: 6px 20px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--accent);
-  border-radius: 0 12px 12px 0;
-  font-size: 14.5px;
+  list-style: none; margin: 0 0 20px; padding: 6px 20px;
+  background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent);
+  border-radius: 0 12px 12px 0; font-size: 14.5px;
 }
 .pits li { padding: 11px 0; line-height: 1.7; border-bottom: 1px solid var(--border); }
 .pits li:last-child { border-bottom: 0; }
 .pits b { font-weight: 600; }
 article p.tight { margin-bottom: 12px; }
 
+/* 「进展」时间线（暂时没有页面在用，留着备用） */
+.log { list-style: none; padding: 0; margin: 0 0 20px; }
+.log li { display: grid; grid-template-columns: 92px 1fr; gap: 18px; padding: 13px 0; border-bottom: 1px solid var(--border); }
+.log li:last-child { border-bottom: 0; }
+.log-date { color: var(--dim); font-size: 13px; font-variant-numeric: tabular-nums; }
+.log li div { line-height: 1.75; }
+@media (max-width: 520px) { .log li { grid-template-columns: 1fr; gap: 3px; } }
+
 /* ---------- 页脚 ---------- */
 footer {
-  margin-top: 88px;
-  padding-top: 26px;
-  border-top: 1px solid var(--border);
-  font-size: 13px;
-  color: var(--muted);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 18px;
-  justify-content: space-between;
+  margin-top: 88px; padding-top: 26px; border-top: 1px solid var(--border);
+  font-size: 13px; color: var(--dim);
+  display: flex; flex-wrap: wrap; gap: 8px 18px; justify-content: space-between;
 }
-footer a { color: var(--muted); }
+footer a { color: var(--dim); }
 
 @media (max-width: 560px) {
   .wrap { padding: 44px 20px 72px; }
+  .wrap--home { padding-top: 12vh; }
   .site-head { margin-bottom: 56px; }
   .site-head h1 { font-size: 29px; }
   section { margin-bottom: 56px; }

@@ -9,6 +9,8 @@
 ```
 index.html                 首页：介绍 + 作品卡片 + 随手写
 style.css                  所有页面共用的样式，改配色/字号来这儿
+rain.js                    首页的雨 + 中间那块玻璃界线
+ripple.js                  详情页的地面水波
 images/                    图片
 projects/
   deskpet.html             桌宠详情页
@@ -23,7 +25,12 @@ projects/
 - **主推作品** → 卡片上加 `card--feature` 类，它就占满一行、图文横排
 - **像素图** → 图片加 `thumb--pixel` / `pixel` 类，放大后保持硬边不发糊
 - **加图片** → 丢进 `images/`，用 `<img src="images/xxx.png" alt="说明">` 引用
-- **换配色** → `style.css` 最上面 `:root` 里的色值（深色模式在下面那块）
+- **换配色** → `style.css` 最上面 `:root` 里的色值
+- **雨大小/密度** → `rain.js` 顶上 `dense`（数字越小雨越密）、`lenMin/lenVar`（长短）、`wMin/wVar`（粗细）
+- **玻璃界线** → 角度在 `style.css` 的 `#glass` 里（`rotateY(26deg)`），宽度和水量在 `rain.js` 的 `GW` 和 `stickDrop`
+- **水波** → `ripple.js` 里 `spawn` 的频率和 `max`（圈能扩多大）
+
+雨量太大卡的话不用管——`rain.js` 里有帧率兜底，掉帧会自己减量。
 
 ## 更新上线
 ```bash
