@@ -133,6 +133,28 @@ section { margin-bottom: 72px; }
   line-height: 1.7;
 }
 
+/* 还没有封面图的卡片：不留空图位，也别被同行的图片卡撑高 */
+.card--text { align-self: start; }
+.card--text .body { padding: 20px 20px 22px; }
+.card .updated { margin-top: 12px; font-size: 12.5px; color: var(--muted); }
+.card .updated::before { content: "●"; color: var(--accent); font-size: 9px; vertical-align: 2px; margin-right: 6px; }
+
+/* ---------- 进展时间线 ---------- */
+.log { list-style: none; padding: 0; margin: 0 0 20px; }
+.log li {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: 18px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--border);
+}
+.log li:last-child { border-bottom: 0; }
+.log-date { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+.log li div { line-height: 1.75; }
+@media (max-width: 520px) {
+  .log li { grid-template-columns: 1fr; gap: 3px; }
+}
+
 /* ---------- 随手写 ---------- */
 .note { padding-bottom: 32px; margin-bottom: 32px; border-bottom: 1px solid var(--border); }
 .note:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom: 0; }
