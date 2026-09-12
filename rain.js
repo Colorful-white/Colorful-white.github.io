@@ -147,43 +147,27 @@
     if (stuck.length > 300) stuck.shift();
   }
 
-  // 一颗水珠。
-  // 参考图是白天，水珠靠"压暗背后的亮天空"显形；这儿背后本来就是黑的，
-  // 压暗等于看不见——暗场里的水只能靠反光被看见，所以主要画边缘和高光。
-  // 光是从下方那片光池来的，所以越靠下的水珠越亮。
+  // 一颗水珠：压暗的身体 + 一圈细亮边 + 一个高光点
   function bead(c, x, y, rx, ry, rot, k) {
-    var lum = k * (.5 + .9 * Math.pow(Math.min(1, y / GH), 1.5));
-
-    // 身体只留一点点暗，用来遮住它背后的雨丝，这是"有东西挡着"的线索
     var g = c.createRadialGradient(x, y - ry * .18, rx * .12, x, y, rx * 1.15);
-    g.addColorStop(0,  'rgba(3,6,13,' + (.34 * k) + ')');
-    g.addColorStop(.7, 'rgba(5,9,18,' + (.18 * k) + ')');
-    g.addColorStop(1,  'rgba(8,14,26,0)');
+    g.addColorStop(0,   'rgba(3,6,13,' + (.5 * k) + ')');
+    g.addColorStop(.7,  'rgba(5,9,18,' + (.28 * k) + ')');
+    g.addColorStop(1,   'rgba(8,14,26,0)');
     c.fillStyle = g;
     c.beginPath();
     c.ellipse(x, y, rx * 1.15, ry * 1.15, rot, 0, 6.284);
     c.fill();
 
-    // 一圈亮边——这才是暗场里唯一能让人看见水的东西
-    c.strokeStyle = 'rgba(198,224,255,' + Math.min(.55, .34 * lum) + ')';
-    c.lineWidth = Math.min(1, .4 + rx * .09);
+    c.strokeStyle = 'rgba(186,216,252,' + (.16 * k) + ')';
+    c.lineWidth = Math.min(.9, .35 + rx * .08);
     c.beginPath();
     c.ellipse(x, y, rx, ry, rot, 0, 6.284);
     c.stroke();
 
-    // 下缘更亮一段：光从下面来
-    if (rx > .9) {
-      c.strokeStyle = 'rgba(220,238,255,' + Math.min(.6, .38 * lum) + ')';
-      c.lineWidth = Math.min(1.2, .5 + rx * .1);
+    if (rx > 1.1) {                            // 够大的才看得出高光
+      c.fillStyle = 'rgba(226,240,255,' + (.2 * k) + ')';
       c.beginPath();
-      c.ellipse(x, y, rx * .98, ry * .98, rot, .6, 2.5);
-      c.stroke();
-    }
-
-    if (rx > 1.1) {                            // 高光点
-      c.fillStyle = 'rgba(235,246,255,' + Math.min(.7, .45 * lum) + ')';
-      c.beginPath();
-      c.ellipse(x - rx * .28, y - ry * .34, rx * .2, ry * .16, rot, 0, 6.284);
+      c.ellipse(x - rx * .3, y - ry * .38, rx * .22, ry * .17, rot, 0, 6.284);
       c.fill();
     }
   }
@@ -215,7 +199,7 @@
       r.y += r.v;
       r.x += Math.sin(r.wob) * .09;                  // 只剩一丝丝摆动
 
-      tx.fillStyle = 'rgba(168,205,245,.2)';
+      tx.fillStyle = 'rgba(150,190,235,.10)';
       tx.beginPath();
       tx.arc(r.x, r.y, Math.max(.6, r.r * .42), 0, 6.284);
       tx.fill();
@@ -245,15 +229,7 @@
 
     for (var n2 = 0; n2 < runners.length; n2++) {
       var rr = runners[n2];
-      bead(gx, rr.x, rr.y, rr.r * .95, rr.r * 1.25, 0, 1.35);  // 在滑的水珠拉长，也更亮
-      // 头部再点一下，眼睛才追得住它
-      var hg = gx.createRadialGradient(rr.x, rr.y + rr.r * .5, 0, rr.x, rr.y + rr.r * .5, rr.r * 1.1);
-      hg.addColorStop(0, 'rgba(226,242,255,.5)');
-      hg.addColorStop(1, 'rgba(180,215,255,0)');
-      gx.fillStyle = hg;
-      gx.beginPath();
-      gx.arc(rr.x, rr.y + rr.r * .5, rr.r * 1.1, 0, 6.284);
-      gx.fill();
+      bead(gx, rr.x, rr.y, rr.r * .95, rr.r * 1.25, 0, .85);   // 在滑的水珠被拉长
     }
 
   }
