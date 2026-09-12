@@ -234,16 +234,10 @@
 
   }
 
-  /* ---------- 驱动 + 帧率兜底 ---------- */
-  var last = 0, slowFrames = 0, scale = 1;
-
-  function trim() {                                // 卡了就自己减雨量，最低到三成
-    scale *= .72;
-    for (var i = 0; i < L.length; i++) {
-      L[i].drops.length = Math.max(120, Math.round(L[i].drops.length * .72));
-    }
-    if (stuck.length > 120) stuck.length = 120;
-  }
+  /* ---------- 驱动 ----------
+     这里原来有个「掉帧就自动减雨量」的机制，去掉了：
+     它只减不加，而且窗口被挡住、失焦这些跟性能无关的情况也会触发，
+     结果是放一会儿雨就莫名其妙变稀。雨量现在是固定的，嫌重就改上面的 dense。 */
 
   function resize() {
     DPR = Math.min(window.devicePixelRatio || 1, 2);
@@ -258,22 +252,13 @@
       for (var j = 0; j < n; j++) l.drops.push(newDrop(l, true));
     }
     stuck.length = 0; runners.length = 0;
-    scale = 1; slowFrames = 0; last = 0;
     placeGlass();
     if (glassOn) for (var k = 0; k < 140; k++) stickDrop();
   }
 
-  function frame(ts) {
+  function frame() {
     requestAnimationFrame(frame);
-    if (document.hidden) { last = 0; return; }
-
-    if (last) {
-      var dt = ts - last;
-      if (dt > 23 && scale > .3) {                 // 低于约 43 帧
-        if (++slowFrames > 90) { trim(); slowFrames = 0; }
-      } else if (slowFrames > 0) slowFrames--;
-    }
-    last = ts;
+    if (document.hidden) return;                   // 标签页不在前台就别白画，省电
 
     drawLayer(L[0], false);
     drawLayer(L[1], true);
