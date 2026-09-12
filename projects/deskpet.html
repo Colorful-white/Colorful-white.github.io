@@ -86,7 +86,15 @@
       <a href="https://github.com/Colorful-white/deskpet/archive/refs/heads/main.zip">下载源码 <span class="meta">ZIP · 约 100 KB</span></a>
       <a href="https://github.com/Colorful-white/deskpet">在 GitHub 上看 <span class="meta">MIT 许可</span></a>
     </div>
-    <p>解压后双击 <code>启动桌宠.vbs</code> 就能跑。依赖全是可选的，装了功能更全；一个都不装也能跑，只是不跟着声音动。</p>
+    <div class="dl-note">
+      下的是源码，不是打包好的 exe——解压出来是一堆 Python 文件。跑之前得知道这些：
+      <ul>
+        <li><strong>只能在 Windows 上跑</strong>。听歌联动用的是 Windows 的系统音频接口（WASAPI 环回、SMTC），换成别的系统整套都不成立</li>
+        <li><strong>要先装 Python 3</strong>。电脑上没有的话，去 python.org 装，安装时记得勾上「Add to PATH」</li>
+        <li>解压后<strong>双击 <code>启动桌宠.vbs</code></strong> 就能跑，不会弹黑框</li>
+        <li>依赖<strong>全是可选的</strong>，一个都不装照样跑，只是不跟着声音动；装了才有听歌联动和跟唱</li>
+      </ul>
+    </div>
     <pre><code>python -m pip install -r requirements.txt
 python main.py</code></pre>
   </article>

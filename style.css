@@ -265,6 +265,13 @@ article p.tight { margin-bottom: 12px; }
 .dl a:hover { border-color: var(--border-lit); background: rgba(14,24,46,.6); transform: translateY(-2px); }
 .dl .meta { font-size: 12.5px; color: var(--dim); }
 
+/* 下载按钮下面的前提说明：该讲清楚的都讲清楚，别让人下完才发现跑不起来 */
+.dl-note { font-size: 13px; color: var(--dim); line-height: 1.75; margin: 0 0 8px; }
+.dl-note ul { list-style: none; padding: 0; margin: 6px 0 0; }
+.dl-note li { margin: 0 0 4px; padding-left: 16px; position: relative; color: var(--dim); }
+.dl-note li::before { content: "·"; position: absolute; left: 5px; }
+.dl-note code { font-size: .92em; }
+
 /* ---------- 页脚 ---------- */
 footer {
   margin-top: 88px; padding-top: 26px; border-top: 1px solid var(--border);
