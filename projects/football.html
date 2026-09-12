@@ -3,12 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>足球联机小游戏 — Budroval</title>
-<meta name="description" content="可以联机踢的小游戏。">
+<title>点球对战 — Budroval</title>
+<meta name="description" content="局域网双人点球游戏。两台手机连同一个热点，轮流罚球与扑救。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐾</text></svg>">
 <meta property="og:type" content="article">
-<meta property="og:title" content="足球联机小游戏">
-<meta property="og:description" content="可以联机踢的小游戏。">
+<meta property="og:title" content="点球对战">
+<meta property="og:description" content="局域网双人点球游戏。两台手机连同一个热点，轮流罚球与扑救。">
+<meta property="og:image" content="https://colorful-white.github.io/images/penalty-icon.png">
 <link rel="stylesheet" href="../style.css">
 </head>
 <body>
@@ -21,18 +22,92 @@
   <a class="back" href="../index.html">← 回首页</a>
 
   <article>
-    <h1>足球联机小游戏</h1>
+    <h1>点球对战</h1>
 
-    <!-- ↓ 这段换成一两句话说清楚它是什么、解决什么问题 -->
-    <p class="lede">一个能联机踢的小游戏。</p>
+    <p class="lede">
+      局域网双人点球游戏。两台手机连同一个热点，一台开房、一台加入，轮流罚球与扑救，
+      五轮定胜负，平局进突然死亡。<strong>没有服务器、没有账号、不联外网</strong>——
+      两台设备在局域网里直接说话。
+    </p>
 
-    <!-- ↓ 有截图了就把下面这块的注释去掉，图片放进 ../images/
-    <figure>
-      <img src="../images/文件名.png" alt="说明">
-      <figcaption>图片下面的小字说明</figcaption>
-    </figure>
-    -->
+    <div class="dl">
+      <a href="../files/FirstTouch.apk" download>下载安装包 <span class="meta">APK · 12 MB · 安卓</span></a>
+    </div>
+    <div class="dl-note">
+      装之前先知道这些：
+      <ul>
+        <li><strong>要两台安卓手机</strong>，连同一个 Wi-Fi 或热点。一个人也能试——游戏里有单机自测模式，同一台手机上同时跑房主和客机</li>
+        <li>下载时浏览器会提示「此类文件可能有害」，安装还要允许<strong>「安装未知来源应用」</strong></li>
+      </ul>
+    </div>
 
+    <h2>怎么玩</h2>
+    <p><strong>射手</strong>有三个维度可以拧：</p>
+    <div class="table-scroll">
+    <table>
+      <tr><th>准星</th><td>在球门上任意拖动，落点是<strong>连续坐标</strong>不是格子。越贴门柱死角越难扑，但砸中门框的概率陡增</td></tr>
+      <tr><th>力度</th><td>球速越快，门将够球的范围越小，代价是落点越飘</td></tr>
+      <tr><th>击球点</th><td>在球上选偏心位置。侧旋让球更难被扑，精度进一步下降</td></tr>
+    </table>
+    </div>
+    <p>
+      <strong>门将</strong>在 5×3 十五格里选一格扑出。双方同时盲选，谁也看不到对方选了哪。
+      一脚罚球有四种结果：进球 / 被扑出 / 打中门框 / 打飞。
+    </p>
+    <p>
+      比赛中双方能用预设短语喊话，其中有一组是<strong>虚张声势</strong>——「我打左边」「我不扑了」
+      这类可真可假的话，等于白送一个心理博弈频道。
+    </p>
+
+    <h2>数值不是拍脑袋定的</h2>
+    <p>规则参数是用蒙特卡洛模拟反复调出来的，目标是贴近真实点球的统计分布：</p>
+    <div class="table-scroll">
+    <table>
+      <tr><th></th><th>本作</th><th>现实点球</th></tr>
+      <tr><td>进球</td><td>76.0%</td><td>约 75%</td></tr>
+      <tr><td>门将扑出</td><td>15.0%</td><td>约 13–18%</td></tr>
+      <tr><td>打飞</td><td>3.0%</td><td>约 6%</td></tr>
+      <tr><td>中门框</td><td>6.0%</td><td>约 5%</td></tr>
+    </table>
+    </div>
+    <p>不同瞄准点之间因此形成了真实的风险曲线（力度 60）：</p>
+    <div class="table-scroll">
+    <table>
+      <tr><th>瞄准</th><th>进球</th><th>被扑</th><th>中框</th></tr>
+      <tr><td>贴门柱死角</td><td>57.0%</td><td>8.6%</td><td>24.8%</td></tr>
+      <tr><td>半高角</td><td>75.2%</td><td>14.2%</td><td>7.0%</td></tr>
+      <tr><td>中路</td><td>77.8%</td><td>19.2%</td><td>0%</td></tr>
+    </table>
+    </div>
+    <p>半高角是甜点区——这也正是现实里教练教的打法。</p>
+
+    <h2>丢掉的那一版</h2>
+    <p>
+      最早做的是六宫格离散模型：射手选一格、门将选一格。做完才发现它<strong>在数学上就是死的</strong>——
+      六个格子完全等价、双方同时盲选，纳什均衡就是各自 1/6 纯随机。
+      意味着没有任何东西可读，所谓「读人」只是幻觉。
+    </p>
+    <p>
+      改成连续落点之后，风险和收益变成了连续的权衡：想要更难扑就得接受更高的中框率。
+      扑救率也自然落到了现实水平。
+    </p>
+
+    <h2>联机怎么做的</h2>
+    <p>
+      核心解算是一个<strong>纯函数</strong>：同样的输入必然产出同样的结果。
+      所以网络上只需要传<strong>双方的输入和一个随机种子</strong>——房主算一次、广播结果，
+      两端各自在本地重放出完全一致的动画。
+    </p>
+    <p>
+      不需要帧同步、不需要延迟补偿，轻微网络延迟完全不影响体验。
+      客机收到结果后还会用同一个种子<strong>重算一遍做校验</strong>，
+      两端规则版本对不上会当场报错，而不是让画面悄悄不同步。
+    </p>
+    <p>
+      规则、连接、协议这三层完全不碰 Android 的接口，所以
+      <strong>全部逻辑都能在电脑上跑单元测试</strong>，不用模拟器也不用真机——
+      让房主和客机在同一个进程里走 127.0.0.1 对接，一整场比赛几秒钟跑完。
+    </p>
   </article>
 
   <footer>
