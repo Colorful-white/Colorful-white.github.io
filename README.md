@@ -9,6 +9,8 @@
 ```
 index.html                 首页：介绍 + 作品卡片 + 随手写
 style.css                  所有页面共用的样式，改配色/字号来这儿
+notes.js                   ★ 随手写的内容，加日记改这个文件
+notes-render.js            把 notes.js 排成页面，不用动
 rain.js                    首页的雨 + 中间那块玻璃界线
 ripple.js                  详情页的地面水波
 images/                    图片
@@ -21,6 +23,7 @@ projects/
 
 ## 常见改动
 - **改介绍** → `index.html` 里 `<header class="site-head">` 那一块
+- **加一条随手写** → 打开 `notes.js`，照着里面的样子在最上面加一段，不用碰 HTML
 - **加作品** → 复制一整块 `<a class="card">…</a>`，再复制一个 `projects/*.html` 改内容
 - **主推作品** → 卡片上加 `card--feature` 类，它就占满一行、图文横排
 - **像素图** → 图片加 `thumb--pixel` / `pixel` 类，放大后保持硬边不发糊
