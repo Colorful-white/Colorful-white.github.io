@@ -134,13 +134,42 @@
   }
 
   function stickDrop() {
+    // 大小按幂分布：绝大多数是针尖大的小点，偶尔一颗黄豆，参考图就是这个比例
+    var t = Math.pow(Math.random(), 2.6);
     stuck.push({
-      x: 6 + Math.random() * (GW - 12),
+      x: 4 + Math.random() * (GW - 8),
       y: Math.random() * GH,
-      r: .5 + Math.random() * 2.6,
-      a: .25 + Math.random() * .45
+      r: .45 + t * 5.5,
+      sq: .78 + Math.random() * .34,          // 扁一点或圆一点，不是标准圆
+      rot: (Math.random() - .5) * .5,
+      a: .3 + Math.random() * .45
     });
-    if (stuck.length > 280) stuck.shift();
+    if (stuck.length > 300) stuck.shift();
+  }
+
+  // 一颗水珠：压暗的身体 + 一圈细亮边 + 一个高光点
+  function bead(c, x, y, rx, ry, rot, k) {
+    var g = c.createRadialGradient(x, y - ry * .18, rx * .12, x, y, rx * 1.15);
+    g.addColorStop(0,   'rgba(3,6,13,' + (.5 * k) + ')');
+    g.addColorStop(.7,  'rgba(5,9,18,' + (.28 * k) + ')');
+    g.addColorStop(1,   'rgba(8,14,26,0)');
+    c.fillStyle = g;
+    c.beginPath();
+    c.ellipse(x, y, rx * 1.15, ry * 1.15, rot, 0, 6.284);
+    c.fill();
+
+    c.strokeStyle = 'rgba(186,216,252,' + (.16 * k) + ')';
+    c.lineWidth = Math.min(.9, .35 + rx * .08);
+    c.beginPath();
+    c.ellipse(x, y, rx, ry, rot, 0, 6.284);
+    c.stroke();
+
+    if (rx > 1.1) {                            // 够大的才看得出高光
+      c.fillStyle = 'rgba(226,240,255,' + (.2 * k) + ')';
+      c.beginPath();
+      c.ellipse(x - rx * .3, y - ry * .38, rx * .22, ry * .17, rot, 0, 6.284);
+      c.fill();
+    }
   }
 
   function drawGlass() {
@@ -193,45 +222,16 @@
     gx.globalAlpha = 1;
 
     for (var m = 0; m < stuck.length; m++) {
-      var s = stuck[m];
-      s.r += .004;                                 // 慢慢积大，直到够重
-      // 水珠像一颗小透镜：中心把背后压暗，只有下缘挂住一点点光
-      var rg = gx.createRadialGradient(s.x, s.y - s.r * .2, s.r * .1, s.x, s.y, s.r * 1.35);
-      rg.addColorStop(0,   'rgba(4,8,16,' + (s.a * .55) + ')');
-      rg.addColorStop(.72, 'rgba(6,11,20,' + (s.a * .3) + ')');
-      rg.addColorStop(1,   'rgba(8,14,26,0)');
-      gx.fillStyle = rg;
-      gx.beginPath();
-      gx.arc(s.x, s.y, s.r * 1.35, 0, 6.284);
-      gx.fill();
-
-      if (s.r > 1.2) {
-        gx.strokeStyle = 'rgba(180,212,250,' + (s.a * .16) + ')';
-        gx.lineWidth = .6;
-        gx.beginPath();
-        gx.arc(s.x, s.y, s.r * .95, .55, 2.35);      // 只画下缘那一段弧
-        gx.stroke();
-      }
+      var s2 = stuck[m];
+      s2.r += .003;                            // 慢慢积大，直到够重开始滑
+      bead(gx, s2.x, s2.y, s2.r, s2.r * s2.sq, s2.rot, s2.a);
     }
 
     for (var n2 = 0; n2 < runners.length; n2++) {
       var rr = runners[n2];
-      var rg2 = gx.createRadialGradient(rr.x, rr.y - rr.r * .3, rr.r * .1, rr.x, rr.y, rr.r * 1.6);
-      rg2.addColorStop(0,   'rgba(4,8,16,.5)');
-      rg2.addColorStop(.72, 'rgba(6,11,20,.28)');
-      rg2.addColorStop(1,   'rgba(8,14,26,0)');
-      gx.fillStyle = rg2;
-      gx.beginPath();
-      gx.ellipse(rr.x, rr.y, rr.r * 1.3, rr.r * 1.7, 0, 0, 6.284);
-      gx.fill();
-
-      gx.strokeStyle = 'rgba(185,215,250,.20)';
-      gx.lineWidth = .7;
-      gx.beginPath();
-      gx.arc(rr.x, rr.y, rr.r * 1.05, .5, 2.4);
-      gx.stroke();
+      bead(gx, rr.x, rr.y, rr.r * .95, rr.r * 1.25, 0, .85);   // 在滑的水珠被拉长
     }
-    gx.globalCompositeOperation = 'source-over';
+
   }
 
   /* ---------- 驱动 + 帧率兜底 ---------- */

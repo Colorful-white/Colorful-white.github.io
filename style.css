@@ -56,7 +56,11 @@ img, video { max-width: 100%; }
   /* 只留一点点侧角。斜太多的话，水痕会被透视拉歪，看着别扭 */
   transform: perspective(1100px) rotateY(10deg);
   transform-origin: 50% 50%;
-  opacity: .7;          /* 宁可看不清，也不要糊成一块白板 */
+  opacity: .85;
+  /* 玻璃后面的雨要虚掉——参考图里景是糊的、水珠是清楚的，
+     这一条比画水珠本身还关键。只作用于它背后的图层，页面文字在它上面不受影响 */
+  backdrop-filter: blur(2.6px);
+  -webkit-backdrop-filter: blur(2.6px);
 }
 
 /* 详情页：只有地上的水波 */
