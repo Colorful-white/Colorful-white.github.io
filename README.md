@@ -17,6 +17,7 @@ images/                    图片
 projects/
   deskpet.html             桌宠详情页
   phototag.html            PhotoTag 详情页
+  matlab.html              MATLAB 学习（待填）
   embedded.html            嵌入式开发（待填）
   football.html            足球联机小游戏（待填）
 ```
