@@ -272,6 +272,29 @@ article p.tight { margin-bottom: 12px; }
 .dl-note li::before { content: "·"; position: absolute; left: 5px; }
 .dl-note code { font-size: .92em; }
 
+/* ---------- 一步一步的操作说明 ---------- */
+.steps { list-style: none; counter-reset: step; padding: 0; margin: 0 0 20px; }
+.steps > li {
+  counter-increment: step;
+  position: relative;
+  padding: 0 0 18px 44px;
+  margin: 0;
+  border-left: 1px solid var(--border);
+  margin-left: 13px;
+}
+.steps > li:last-child { border-left-color: transparent; padding-bottom: 0; }
+.steps > li::before {
+  content: counter(step);
+  position: absolute; left: -14px; top: -2px;
+  width: 27px; height: 27px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; color: var(--accent);
+  background: var(--surface-solid); border: 1px solid var(--border);
+}
+.steps b { display: block; margin-bottom: 4px; font-weight: 600; color: var(--text); }
+.steps p { margin: 0 0 8px !important; font-size: 14.5px; }
+.steps pre { margin: 8px 0 0; font-size: 13.5px; }
+
 /* ---------- 页脚 ---------- */
 footer {
   margin-top: 88px; padding-top: 26px; border-top: 1px solid var(--border);

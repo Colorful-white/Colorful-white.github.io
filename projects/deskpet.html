@@ -81,22 +81,56 @@
       <figcaption>所有动作的所有帧</figcaption>
     </figure>
 
-    <h2>安装包</h2>
+    <h2>怎么用上</h2>
     <div class="dl">
       <a href="https://github.com/Colorful-white/deskpet/archive/refs/heads/main.zip">下载源码 <span class="meta">ZIP · 约 100 KB</span></a>
       <a href="https://github.com/Colorful-white/deskpet">在 GitHub 上看 <span class="meta">MIT 许可</span></a>
     </div>
     <div class="dl-note">
-      下的是源码，不是打包好的 exe——解压出来是一堆 Python 文件。跑之前得知道这些：
+      下的是源码，不是双击就能用的 exe。<strong>只能在 Windows 上跑</strong>——
+      听歌联动用的是 Windows 的系统音频接口，换别的系统整套都不成立。
+    </div>
+
+    <h3>一步步跑起来</h3>
+    <ol class="steps">
+      <li>
+        <b>解压</b>
+        <p>下载到的是个压缩包。右键它 → 「全部解压缩」，解到哪儿都行，记住位置。</p>
+      </li>
+      <li>
+        <b>装 Python（只用装一次）</b>
+        <p>
+          电脑上没有的话，去 <a href="https://www.python.org/downloads/">python.org/downloads</a>
+          下最新的 Python 3，双击安装。
+          <strong>安装界面最下面有个「Add python.exe to PATH」，一定要勾上</strong>——
+          这一步漏了，后面所有命令都会提示找不到 python。
+        </p>
+      </li>
+      <li>
+        <b>装依赖（可以跳过，但跳了就没有听歌联动）</b>
+        <p>
+          打开第 1 步解压出来的文件夹，在<strong>地址栏</strong>里把路径删掉、输入 <code>cmd</code> 回车，
+          会弹出一个黑窗口，把下面这行粘进去按回车，等它装完：
+        </p>
+        <pre><code>python -m pip install -r requirements.txt</code></pre>
+        <p>装得很慢或者报网络错误的话，用国内镜像：</p>
+        <pre><code>python -m pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple</code></pre>
+      </li>
+      <li>
+        <b>双击 <code>启动桌宠.vbs</code></b>
+        <p>小人就出来了，不会弹黑框。它不在任务栏里，<strong>要退出请右键小人 → 「❌ 退出」</strong>。</p>
+      </li>
+    </ol>
+
+    <h3>跑不起来的话</h3>
+    <div class="dl-note">
       <ul>
-        <li><strong>只能在 Windows 上跑</strong>。听歌联动用的是 Windows 的系统音频接口（WASAPI 环回、SMTC），换成别的系统整套都不成立</li>
-        <li><strong>要先装 Python 3</strong>。电脑上没有的话，去 python.org 装，安装时记得勾上「Add to PATH」</li>
-        <li>解压后<strong>双击 <code>启动桌宠.vbs</code></strong> 就能跑，不会弹黑框</li>
-        <li>依赖<strong>全是可选的</strong>，一个都不装照样跑，只是不跟着声音动；装了才有听歌联动和跟唱</li>
+        <li><strong>双击没反应、或者提示找不到 python</strong>——Python 没装，或者装的时候没勾「Add to PATH」。重装一遍勾上就行</li>
+        <li><strong>杀毒软件拦下了 .vbs</strong>——选允许运行。它只是个启动脚本，内容就几行，可以自己用记事本打开看</li>
+        <li><strong>小人出来了但不跟着音乐动</strong>——第 3 步的依赖没装上。不装也能玩，只是少了听歌联动那部分</li>
       </ul>
     </div>
-    <pre><code>python -m pip install -r requirements.txt
-python main.py</code></pre>
+
   </article>
 
   <footer>
