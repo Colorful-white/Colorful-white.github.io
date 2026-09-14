@@ -1,13 +1,35 @@
-/* 右上角的音效栏。声音全部是浏览器里实时合成的，不用下载音频文件。
-   要加新声音：在下面 SOUNDS 里加一项，写一个 make 函数就行。 */
+/* 右上角的音效栏。
+   雨声：4 段窗边实录，按雨的大小排好，横条上 4 个点切换，切换时交叉淡入淡出。
+   屋檐滴水：两个水滴单音，隔 0.8~4 秒随机滴一下。
+   素材都来自 OpenGameArt.org，CC0 许可。 */
 (function () {
   var AC = window.AudioContext || window.webkitAudioContext;
   if (!AC) return;
 
+  var BASE = new URL('.', (document.currentScript && document.currentScript.src) || location.href).href;
+
+  var RAIN_LEVELS = [
+    // gain：几段录音原本的响度差了 17dB，这里拉近一点，只保留"越大越响一些"
+    { src: 'sounds/rain-lv1.mp3', gain: 2.8,  label: '毛毛雨' },
+    { src: 'sounds/rain-lv2.mp3', gain: 1.58, label: '小雨' },
+    { src: 'sounds/rain-lv3.mp3', gain: 1.3,  label: '中雨' },
+    { src: 'sounds/rain-lv4.mp3', gain: 1.0,  label: '大雨' }
+  ];
+  var DRIPS = ['sounds/drip-1.ogg', 'sounds/drip-2.ogg'];
+
+  /* ---------- 记住上次的设置 ---------- */
   var KEY = 'budroval-sound';
   var saved = {};
   try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) {}
+  saved.rain = saved.rain || {};
+  saved.drip = saved.drip || {};
+  if (saved.rain.vol == null) saved.rain.vol = .6;
+  if (saved.rain.level == null) saved.rain.level = 1;
+  if (saved.drip.vol == null) saved.drip.vol = .6;
   function save() { try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {} }
+
+  // 人耳听音量是对数的，滑块直接当音量用的话，拖到一半听着几乎没变化
+  function curve(v) { return v * v; }
 
   var ctx = null;
   function audio() {
@@ -16,156 +38,137 @@
     return ctx;
   }
 
-  /* ---------- 噪声素材 ---------- */
-  // 粉红噪声：比白噪声柔，低频多一点，听着不刺耳
-  function pinkBuffer(c, seconds) {
-    var len = c.sampleRate * seconds, buf = c.createBuffer(2, len, c.sampleRate);
-    for (var ch = 0; ch < 2; ch++) {
-      var d = buf.getChannelData(ch), b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-      for (var i = 0; i < len; i++) {
-        var w = Math.random() * 2 - 1;
-        b0 = .99886 * b0 + w * .0555179; b1 = .99332 * b1 + w * .0750759;
-        b2 = .969 * b2 + w * .153852;    b3 = .8665 * b3 + w * .3104856;
-        b4 = .55 * b4 + w * .5329522;    b5 = -.7616 * b5 - w * .016898;
-        d[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * .5362) * .11;
-        b6 = w * .115926;
-      }
+  var buffers = {};
+  function load(path) {
+    if (!buffers[path]) {
+      buffers[path] = fetch(BASE + path)
+        .then(function (r) { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
+        .then(function (a) { return new Promise(function (ok, bad) { audio().decodeAudioData(a, ok, bad); }); });
+      buffers[path].catch(function () { delete buffers[path]; showError(); });
     }
-    return buf;
+    return buffers[path];
   }
-  // 褐噪声：更闷，当远处的雨幕
-  function brownBuffer(c, seconds) {
-    var len = c.sampleRate * seconds, buf = c.createBuffer(2, len, c.sampleRate);
-    for (var ch = 0; ch < 2; ch++) {
-      var d = buf.getChannelData(ch), last = 0;
-      for (var i = 0; i < len; i++) {
-        last = (last + .02 * (Math.random() * 2 - 1)) / 1.02;
-        d[i] = last * 3.5;
-      }
+
+  /* ---------- 无缝循环：首尾交叠 1.5 秒做等功率交叉淡化 ----------
+     mp3 编码时首尾会补一小段静音，直接 loop 会在接头处"咔"一下，交叠着放就听不出来 */
+  var FADE = 1.5, UP = new Float32Array(64), DOWN = new Float32Array(64);
+  for (var i = 0; i < 64; i++) {
+    UP[i] = Math.sin(i / 63 * Math.PI / 2);
+    DOWN[i] = Math.cos(i / 63 * Math.PI / 2);
+  }
+
+  function looper(c, buf, out) {
+    var dur = buf.duration, next = c.currentTime + .05, live = [], timer;
+    function seg(t) {
+      var s = c.createBufferSource(), g = c.createGain();
+      s.buffer = buf;
+      g.gain.setValueCurveAtTime(UP, t, FADE);
+      g.gain.setValueCurveAtTime(DOWN, t + dur - FADE, FADE);
+      s.connect(g); g.connect(out);
+      s.start(t); s.stop(t + dur + .05);
+      live.push(s);
+      s.onended = function () { var k = live.indexOf(s); if (k >= 0) live.splice(k, 1); g.disconnect(); };
     }
-    return buf;
-  }
-  function loop(c, buf) {
-    var s = c.createBufferSource();
-    s.buffer = buf; s.loop = true;
-    s.offset = Math.random() * buf.duration;           // 两层错开起点，避免听出同一段
-    return s;
+    function schedule() {
+      // 往前排一整段：后台标签页里定时器一秒才跑一次，也不会断
+      while (next < c.currentTime + dur) { seg(next); next += dur - FADE; }
+    }
+    schedule();
+    timer = setInterval(schedule, 1000);
+    return { stop: function (t) { clearInterval(timer); live.forEach(function (s) { try { s.stop(t); } catch (e) {} }); } };
   }
 
   /* ---------- 雨 ---------- */
-  function makeRain(c, out) {
-    var nodes = [];
+  var rain = null;   // { master, layers: [{level, gain, loop}] }
 
-    // 1) 沙沙的主体
-    var hiss = loop(c, pinkBuffer(c, 6));
-    var hp = c.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 400;
-    var lp = c.createBiquadFilter(); lp.type = 'lowpass';  lp.frequency.value = 3800;
-    var hissGain = c.createGain(); hissGain.gain.value = .55;
-    hiss.connect(hp); hp.connect(lp); lp.connect(hissGain); hissGain.connect(out);
-
-    // 2) 远处的雨幕，低沉
-    var body = loop(c, brownBuffer(c, 7));
-    var blp = c.createBiquadFilter(); blp.type = 'lowpass'; blp.frequency.value = 520;
-    var bodyGain = c.createGain(); bodyGain.gain.value = .35;
-    body.connect(blp); blp.connect(bodyGain); bodyGain.connect(out);
-
-    // 雨势慢慢起伏：两个很慢的 LFO 叠在主体音量上
-    var lfo1 = c.createOscillator(); lfo1.frequency.value = .043;
-    var lfo2 = c.createOscillator(); lfo2.frequency.value = .11;
-    var l1g = c.createGain(); l1g.gain.value = .12;
-    var l2g = c.createGain(); l2g.gain.value = .05;
-    lfo1.connect(l1g); l1g.connect(hissGain.gain);
-    lfo2.connect(l2g); l2g.connect(hissGain.gain);
-
-    hiss.start(0, hiss.offset); body.start(0, body.offset); lfo1.start(); lfo2.start();
-    nodes.push(hiss, body, lfo1, lfo2);
-
-    // 3) 雨点：随机的短促滴答，淅淅沥沥全靠这层
-    var tick = c.createBuffer(1, Math.floor(c.sampleRate * .06), c.sampleRate);
-    var td = tick.getChannelData(0);
-    for (var i = 0; i < td.length; i++) td[i] = Math.random() * 2 - 1;
-
-    var dropBus = c.createGain(); dropBus.gain.value = .5; dropBus.connect(out);
-    var next = c.currentTime + .1, timer;
-
-    function drop(t) {
-      var s = c.createBufferSource(); s.buffer = tick;
-      var heavy = Math.random() < .12;
-      var f = c.createBiquadFilter(); f.type = 'bandpass';
-      f.frequency.value = heavy ? 700 + Math.random() * 900 : 1800 + Math.random() * 4200;
-      f.Q.value = heavy ? 2 : 1.2 + Math.random() * 3;
+  function rainLevel(level) {
+    var c = audio(), r = rain, def = RAIN_LEVELS[level];
+    load(def.src).then(function (buf) {
+      if (rain !== r || !rain) return;                    // 等解码的时候已经关掉了
+      if (saved.rain.level !== level) return;             // 等解码的时候又换档了
+      var t = c.currentTime;
+      rain.layers.forEach(function (L) {                  // 旧的慢慢淡出
+        L.gain.gain.cancelScheduledValues(t);
+        L.gain.gain.setTargetAtTime(0, t, .8);
+        L.loop.stop(t + 4);
+      });
       var g = c.createGain();
-      var peak = (heavy ? .5 : .16) * (.35 + Math.random() * .65);
-      var decay = heavy ? .05 + Math.random() * .05 : .008 + Math.random() * .03;
-      g.gain.setValueAtTime(0, t);
-      g.gain.linearRampToValueAtTime(peak, t + .002);
-      g.gain.exponentialRampToValueAtTime(.0001, t + decay);
-      var chain = f;
-      if (c.createStereoPanner) {
-        var p = c.createStereoPanner(); p.pan.value = Math.random() * 1.6 - .8;
-        f.connect(p); chain = p;
-      }
-      s.connect(f); chain.connect(g); g.connect(dropBus);
-      s.start(t); s.stop(t + decay + .02);
-    }
-
-    // 用"往前排一段"的方式调度：后台标签页里定时器会被压到一秒一次，排得够远就不会断
-    function schedule() {
-      var horizon = c.currentTime + 1.6;
-      while (next < horizon) {
-        drop(next);
-        next += -Math.log(1 - Math.random()) / 28;   // 平均每秒 28 滴，间隔随机
-      }
-    }
-    schedule();
-    timer = setInterval(schedule, 250);
-
-    return {
-      stop: function (at) {
-        clearInterval(timer);
-        for (var k = 0; k < nodes.length; k++) { try { nodes[k].stop(at); } catch (e) {} }
-      }
-    };
+      g.gain.value = 0;
+      g.gain.setTargetAtTime(def.gain, t, .8);            // 新的慢慢淡入
+      g.connect(rain.master);
+      rain.layers = [{ level: level, gain: g, loop: looper(c, buf, g) }];
+    });
+    // 旁边两档先解码好，切换时不用等
+    [level - 1, level + 1].forEach(function (n) { if (RAIN_LEVELS[n]) load(RAIN_LEVELS[n].src); });
   }
 
-  /* ---------- 声音清单：以后加新声音往这儿加 ---------- */
-  var SOUNDS = [
-    { id: 'rain', name: '雨声', make: makeRain }
-  ];
-
-  /* ---------- 播放控制 ---------- */
-  var playing = {};    // id -> { gain, handle }
-
-  function setVol(id, v) {
-    saved[id] = saved[id] || {};
-    saved[id].vol = v; save();
-    if (playing[id]) playing[id].gain.gain.setTargetAtTime(v, ctx.currentTime, .15);
+  function rainOn() {
+    if (rain) return;
+    var c = audio(), m = c.createGain();
+    m.gain.value = 0;
+    m.gain.setTargetAtTime(curve(saved.rain.vol), c.currentTime, .6);
+    m.connect(c.destination);
+    rain = { master: m, layers: [] };
+    rainLevel(saved.rain.level);
+    saved.rain.on = true; save(); refresh();
   }
 
-  function start(id) {
-    if (playing[id]) return;
-    var def = SOUNDS.filter(function (s) { return s.id === id; })[0];
-    var c = audio();
-    var g = c.createGain();
-    g.gain.value = 0;
-    g.connect(c.destination);
-    var vol = (saved[id] && saved[id].vol != null) ? saved[id].vol : .5;
-    g.gain.setTargetAtTime(vol, c.currentTime, .6);       // 慢慢淡入，不会"砰"地响起来
-    playing[id] = { gain: g, handle: def.make(c, g) };
-    saved[id] = saved[id] || {}; saved[id].on = true; save();
-    refresh();
+  function rainOff() {
+    if (!rain) return;
+    var c = ctx, r = rain, t = c.currentTime;
+    r.master.gain.setTargetAtTime(0, t, .5);
+    r.layers.forEach(function (L) { L.loop.stop(t + 3); });
+    setTimeout(function () { r.master.disconnect(); }, 3200);
+    rain = null;
+    saved.rain.on = false; save(); refresh();
   }
 
-  function stop(id) {
-    var p = playing[id];
-    if (!p) return;
-    var t = ctx.currentTime;
-    p.gain.gain.setTargetAtTime(0, t, .4);                // 淡出
-    p.handle.stop(t + 2);
-    setTimeout(function () { p.gain.disconnect(); }, 2200);
-    delete playing[id];
-    saved[id] = saved[id] || {}; saved[id].on = false; save();
-    refresh();
+  /* ---------- 屋檐滴水 ---------- */
+  var drip = null;   // { master, timer, next }
+
+  function dripOn() {
+    if (drip) return;
+    var c = audio(), m = c.createGain();
+    m.gain.value = curve(saved.drip.vol);
+    m.connect(c.destination);
+    drip = { master: m, next: c.currentTime + .6, timer: null };
+    var d = drip;
+    Promise.all(DRIPS.map(load)).then(function (bufs) {
+      if (drip !== d) return;
+      d.next = c.currentTime + .3;                        // 从加载完那一刻起算，别把等待期间"欠"的水滴一口气补上
+      function one(t) {
+        var s = c.createBufferSource(), g = c.createGain();
+        s.buffer = bufs[(Math.random() * bufs.length) | 0];
+        s.playbackRate.value = .85 + Math.random() * .3;  // 音高偏一点点，不会每滴都一样
+        g.gain.value = .35 + Math.random() * .6;
+        var tail = g;
+        if (c.createStereoPanner) {
+          var p = c.createStereoPanner(); p.pan.value = Math.random() * 1.2 - .6;
+          g.connect(p); tail = p;
+        }
+        s.connect(g); tail.connect(d.master);
+        s.start(t);
+      }
+      function schedule() {
+        while (d.next < c.currentTime + 5) {
+          one(d.next);
+          d.next += .8 + Math.random() * 3.2;
+        }
+      }
+      schedule();
+      d.timer = setInterval(schedule, 1000);
+    });
+    saved.drip.on = true; save(); refresh();
+  }
+
+  function dripOff() {
+    if (!drip) return;
+    var d = drip;
+    clearInterval(d.timer);
+    d.master.gain.setTargetAtTime(0, ctx.currentTime, .3);
+    setTimeout(function () { d.master.disconnect(); }, 1500);
+    drip = null;
+    saved.drip.on = false; save(); refresh();
   }
 
   /* ---------- 界面 ---------- */
@@ -175,68 +178,90 @@
 
   var wrap = document.createElement('div');
   wrap.className = 'sfx';
-  var btn = document.createElement('button');
-  btn.className = 'sfx-btn';
-  btn.type = 'button';
-  btn.title = '音效';
-  btn.setAttribute('aria-label', '音效');
-  btn.innerHTML = ICON;
+  wrap.innerHTML =
+    '<button type="button" class="sfx-btn" title="音效" aria-label="音效">' + ICON + '</button>' +
+    '<div class="sfx-panel" hidden>' +
+      '<div class="sfx-title">音效</div>' +
 
-  var panel = document.createElement('div');
-  panel.className = 'sfx-panel';
-  panel.hidden = true;
+      '<div class="sfx-block" data-id="rain">' +
+        '<button type="button" class="sfx-toggle"><span class="sfx-dot"></span>雨声</button>' +
+        '<div class="sfx-levels" role="radiogroup" aria-label="雨的大小">' +
+          '<div class="sfx-track"><div class="sfx-fill"></div></div>' +
+          RAIN_LEVELS.map(function (L, n) {
+            return '<button type="button" class="sfx-node" data-level="' + n + '" role="radio" title="' + L.label + '" aria-label="' + L.label + '"></button>';
+          }).join('') +
+        '</div>' +
+        '<div class="sfx-level-names"><span>小</span><span class="sfx-level-now"></span><span>大</span></div>' +
+        '<label class="sfx-vol-row">音量<input class="sfx-vol" type="range" min="0" max="1" step="0.01" value="' + saved.rain.vol + '"></label>' +
+      '</div>' +
 
-  var rowsHtml = '<div class="sfx-title">音效</div>';
-  SOUNDS.forEach(function (s) {
-    var vol = (saved[s.id] && saved[s.id].vol != null) ? saved[s.id].vol : .5;
-    rowsHtml +=
-      '<div class="sfx-row" data-id="' + s.id + '">' +
-        '<button type="button" class="sfx-toggle" aria-pressed="false">' +
-          '<span class="sfx-dot"></span>' + s.name +
-        '</button>' +
-        '<input class="sfx-vol" type="range" min="0" max="1" step="0.01" value="' + vol + '" aria-label="' + s.name + '音量">' +
-      '</div>';
-  });
-  rowsHtml += '<div class="sfx-hint">更多声音以后再加</div>';
-  panel.innerHTML = rowsHtml;
+      '<div class="sfx-block" data-id="drip">' +
+        '<button type="button" class="sfx-toggle"><span class="sfx-dot"></span>屋檐滴水</button>' +
+        '<label class="sfx-vol-row">音量<input class="sfx-vol" type="range" min="0" max="1" step="0.01" value="' + saved.drip.vol + '"></label>' +
+      '</div>' +
 
-  wrap.appendChild(btn);
-  wrap.appendChild(panel);
+      '<div class="sfx-hint"></div>' +
+    '</div>';
   document.body.appendChild(wrap);
 
-  function refresh() {
-    var any = false;
-    [].forEach.call(panel.querySelectorAll('.sfx-row'), function (row) {
-      var on = !!playing[row.getAttribute('data-id')];
-      any = any || on;
-      row.classList.toggle('on', on);
-      row.querySelector('.sfx-toggle').setAttribute('aria-pressed', on ? 'true' : 'false');
-    });
-    btn.classList.toggle('on', any);
+  var btn = wrap.querySelector('.sfx-btn');
+  var panel = wrap.querySelector('.sfx-panel');
+  var hint = wrap.querySelector('.sfx-hint');
+
+  function showError() {
+    hint.textContent = location.protocol === 'file:'
+      ? '直接双击打开的本地页面放不了声音，推上线之后就能听'
+      : '声音文件没加载出来，刷新一下试试';
   }
 
-  btn.addEventListener('click', function (e) {
-    e.stopPropagation();
-    panel.hidden = !panel.hidden;
-  });
+  function refresh() {
+    var rb = wrap.querySelector('[data-id="rain"]'), db = wrap.querySelector('[data-id="drip"]');
+    rb.classList.toggle('on', !!rain);
+    db.classList.toggle('on', !!drip);
+    var lv = saved.rain.level;
+    [].forEach.call(wrap.querySelectorAll('.sfx-node'), function (n) {
+      var k = +n.getAttribute('data-level');
+      n.classList.toggle('active', k === lv);
+      n.classList.toggle('passed', k < lv);
+      n.setAttribute('aria-checked', k === lv ? 'true' : 'false');
+    });
+    wrap.querySelector('.sfx-fill').style.width = (lv / (RAIN_LEVELS.length - 1) * 100) + '%';
+    wrap.querySelector('.sfx-level-now').textContent = RAIN_LEVELS[lv].label;
+    btn.classList.toggle('on', !!(rain || drip));
+  }
+
+  btn.addEventListener('click', function (e) { e.stopPropagation(); panel.hidden = !panel.hidden; });
   panel.addEventListener('click', function (e) { e.stopPropagation(); });
   document.addEventListener('click', function () { panel.hidden = true; });
 
   panel.addEventListener('click', function (e) {
-    var t = e.target.closest('.sfx-toggle');
-    if (!t) return;
-    var id = t.parentNode.getAttribute('data-id');
-    playing[id] ? stop(id) : start(id);
-  });
-  panel.addEventListener('input', function (e) {
-    if (!e.target.classList.contains('sfx-vol')) return;
-    setVol(e.target.parentNode.getAttribute('data-id'), parseFloat(e.target.value));
+    var tg = e.target.closest('.sfx-toggle');
+    if (tg) {
+      var id = tg.parentNode.getAttribute('data-id');
+      if (id === 'rain') rain ? rainOff() : rainOn();
+      else drip ? dripOff() : dripOn();
+      return;
+    }
+    var node = e.target.closest('.sfx-node');
+    if (node) {
+      var lv = +node.getAttribute('data-level');
+      if (lv === saved.rain.level && rain) return;
+      saved.rain.level = lv; save(); refresh();
+      rain ? rainLevel(lv) : rainOn();                    // 点档位就当你想听雨了
+    }
   });
 
-  /* 上次开着的，这次接着放。
-     浏览器不允许网页没被点过就出声，所以要等你在页面上点一下或按个键 */
-  var wanted = SOUNDS.filter(function (s) { return saved[s.id] && saved[s.id].on; });
-  if (wanted.length) {
+  panel.addEventListener('input', function (e) {
+    if (!e.target.classList.contains('sfx-vol')) return;
+    var id = e.target.closest('.sfx-block').getAttribute('data-id');
+    var v = parseFloat(e.target.value);
+    saved[id].vol = v; save();
+    var node = id === 'rain' ? (rain && rain.master) : (drip && drip.master);
+    if (node) node.gain.setTargetAtTime(curve(v), ctx.currentTime, .08);
+  });
+
+  /* 上次开着的，这次接着放。浏览器不允许网页没被点过就出声，所以要等你点一下页面 */
+  if (saved.rain.on || saved.drip.on) {
     btn.classList.add('pending');
     btn.title = '点一下页面任意位置，继续播放上次开着的声音';
     var resume = function (e) {
@@ -244,9 +269,9 @@
       removeEventListener('keydown', resume, true);
       btn.classList.remove('pending');
       btn.title = '音效';
-      // 这一下本来就是点在音效栏上的，交给按钮自己处理，不然会"开了又关"
-      if (e && e.target && e.target.closest && e.target.closest('.sfx')) return;
-      wanted.forEach(function (s) { start(s.id); });
+      if (e && e.target && e.target.closest && e.target.closest('.sfx')) return;  // 点的就是音效栏，交给它自己处理
+      if (saved.rain.on) rainOn();
+      if (saved.drip.on) dripOn();
     };
     addEventListener('pointerdown', resume, true);
     addEventListener('keydown', resume, true);
