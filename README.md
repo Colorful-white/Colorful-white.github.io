@@ -12,6 +12,7 @@ style.css                  所有页面共用的样式，改配色/字号来这�
 notes.js                   ★ 随手写的内容，加日记改这个文件
 notes-render.js            把 notes.js 排成页面，不用动
 rain.js                    首页的雨 + 中间那块玻璃界线
+sound.js                   右上角音效栏（雨声是实时合成的，没有音频文件）
 pet/pet.js                 首页溜达的那只桌宠
 pet/pet-data.js            桌宠的形象和台词（从桌宠原项目导出的，别手改）
 pet/export_from_deskpet.py 桌面版改了形象/台词之后，跑它重新导出
