@@ -296,6 +296,24 @@ article p.tight { margin-bottom: 12px; }
 .steps p { margin: 0 0 8px !important; font-size: 14.5px; }
 .steps pre { margin: 8px 0 0; font-size: 13.5px; }
 
+/* ---------- 网页版桌宠 ---------- */
+.webpet { position: fixed; z-index: 30; image-rendering: pixelated; cursor: grab; touch-action: none; }
+.webpet:active { cursor: grabbing; }
+.webpet-bubble {
+  position: fixed; z-index: 31; transform: translateX(-50%);
+  max-width: 210px; padding: 7px 12px;
+  font-size: 13px; line-height: 1.55; text-align: center; color: var(--text);
+  background: rgba(12,20,38,.85); border: 1px solid var(--border); border-radius: 10px;
+  backdrop-filter: blur(6px);
+  pointer-events: none; opacity: 0; transition: opacity .35s;
+}
+.webpet-zzz {
+  position: fixed; z-index: 31; pointer-events: none; image-rendering: pixelated;
+  opacity: 0; transition: opacity .6s;
+  animation: webpet-zzz 2.4s ease-in-out infinite;
+}
+@keyframes webpet-zzz { 50% { transform: translateY(-8px); } }
+
 /* ---------- 页脚 ---------- */
 footer {
   margin-top: 88px; padding-top: 26px; border-top: 1px solid var(--border);
