@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>结构光 3D 重建 — Budroval</title>
-<meta name="description" content="准备从零搭一套结构光 3D 重建系统，这一页记下过程。">
+<meta name="description" content="从零搭一套结构光 3D 重建系统，边学边记。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐾</text></svg>">
 <meta property="og:type" content="article">
 <meta property="og:title" content="结构光 3D 重建">
-<meta property="og:description" content="准备从零搭一套结构光 3D 重建系统，这一页记下过程。">
+<meta property="og:description" content="从零搭一套结构光 3D 重建系统，边学边记。">
 <link rel="stylesheet" href="../style.css">
 </head>
 <body>
@@ -24,7 +24,7 @@
     <h1>结构光 3D 重建</h1>
 
     <!-- ↓ 这段换成一两句话说清楚它是什么、解决什么问题 -->
-    <p class="lede">准备从零搭一套结构光 3D 重建系统，这一页往后记下搭的过程。</p>
+    <p class="lede">从零搭一套结构光 3D 重建系统，这一页记下学到的知识点和搭的过程。</p>
 
     <!-- ↓ 有截图了就把下面这块的注释去掉，图片放进 ../images/
     <figure>
@@ -32,6 +32,118 @@
       <figcaption>图片下面的小字说明</figcaption>
     </figure>
     -->
+
+    <h2>知识点</h2>
+    <!-- 以后加新的知识点：复制一整块 <section class="kp">…</section> 改内容就行 -->
+
+    <section class="kp" id="epipolar">
+      <h3>极线约束</h3>
+
+      <p class="kp-one">
+        左图中一点 P1 在右图里的对应点 P2，一定落在右极线上。
+        所以匹配时不用搜整张图，<strong>只搜一条线</strong>。
+      </p>
+
+      <figure class="kp-fig">
+        <svg viewBox="0 0 640 370" role="img" aria-labelledby="epi-title">
+          <title id="epi-title">极线约束示意：空间点 P、两个光心、极平面、极点和极线</title>
+
+          <!-- 极平面 -->
+          <polygon class="epi-plane" points="90,300 320,40 560,300"/>
+          <text class="epi-soft" x="320" y="250" text-anchor="middle">极平面</text>
+
+          <!-- 两个成像面 -->
+          <polygon class="epi-img" points="130,150 250,120 255,320 135,350"/>
+          <polygon class="epi-img" points="510,150 390,120 385,320 505,350"/>
+          <text class="epi-soft" x="140" y="140">左成像面</text>
+          <text class="epi-soft" x="500" y="140" text-anchor="end">右成像面</text>
+
+          <!-- 基线 -->
+          <line class="epi-base" x1="90" y1="300" x2="560" y2="300"/>
+          <text class="epi-soft" x="320" y="322" text-anchor="middle">基线</text>
+
+          <!-- 左边：射线 C1→P，深度未知 -->
+          <line class="epi-ray" x1="90" y1="300" x2="320" y2="40"/>
+          <!-- 右边：真实的 P，以及射线上另外两个可能的深度 -->
+          <line class="epi-ray" x1="560" y1="300" x2="320" y2="40"/>
+          <line class="epi-ghost" x1="560" y1="300" x2="274" y2="92"/>
+          <line class="epi-ghost" x1="560" y1="300" x2="228" y2="144"/>
+
+          <!-- 极线 -->
+          <line class="epi-line" x1="217.2" y1="304.6" x2="146" y2="158.9"/>
+          <line class="epi-line" x1="422.4" y1="304.6" x2="519.4" y2="131.7"/>
+          <text class="epi-line-t" x="142" y="176" text-anchor="end">l1</text>
+          <text class="epi-line-t" x="528" y="138">l2</text>
+
+          <!-- 射线上的候选点，投到右图都在 l2 上 -->
+          <circle class="epi-ghost-pt" cx="274" cy="92" r="3.5"/>
+          <circle class="epi-ghost-pt" cx="228" cy="144" r="3.5"/>
+          <text class="epi-soft" x="266" y="88" text-anchor="end">P″</text>
+          <text class="epi-soft" x="220" y="140" text-anchor="end">P′</text>
+          <circle class="epi-ghost-pt" cx="464.1" cy="230.2" r="3"/>
+          <circle class="epi-ghost-pt" cx="453.1" cy="249.8" r="3"/>
+
+          <!-- 点 -->
+          <circle class="epi-pt" cx="320" cy="40" r="5.5"/>
+          <text class="epi-t" x="332" y="36">P</text>
+
+          <circle class="epi-hit" cx="170.5" cy="209" r="5"/>
+          <text class="epi-t" x="158" y="222" text-anchor="end">P1</text>
+          <circle class="epi-hit" cx="476" cy="209" r="5"/>
+          <text class="epi-t" x="486" y="214">P2</text>
+
+          <circle class="epi-epi" cx="215" cy="300" r="4.5"/>
+          <text class="epi-epi-t" x="206" y="288" text-anchor="end">e1</text>
+          <circle class="epi-epi" cx="425" cy="300" r="4.5"/>
+          <text class="epi-epi-t" x="434" y="288">e2</text>
+
+          <circle class="epi-c" cx="90" cy="300" r="6"/>
+          <text class="epi-t" x="90" y="326" text-anchor="middle">C1</text>
+          <circle class="epi-c" cx="560" cy="300" r="6"/>
+          <text class="epi-t" x="560" y="326" text-anchor="middle">C2</text>
+        </svg>
+        <figcaption>
+          左边只知道 P1，P 可能在射线 C1→P1 上任何位置（P′、P″……）。
+          这些候选点投到右图，全都排在右极线 l2 上。
+        </figcaption>
+      </figure>
+
+      <h4>基本概念</h4>
+      <div class="table-scroll">
+      <table>
+        <tr><th>名称</th><th>定义</th><th>常用记号</th></tr>
+        <tr><td>光心 C1、C2</td><td>两个相机的中心</td><td>O1、O2</td></tr>
+        <tr><td>基线</td><td>两个光心的连线 C1C2</td><td>—</td></tr>
+        <tr><td>极平面</td><td>空间点 P 和 C1、C2 三点构成的平面</td><td>—</td></tr>
+        <tr><td>极点</td><td>基线与成像平面的交点</td><td>e1、e2</td></tr>
+        <tr><td>极线</td><td>极平面与成像平面的交线</td><td>l1、l2</td></tr>
+      </table>
+      </div>
+      <p class="kp-warn">
+        注意：课件用 e 表示极线、f 表示极点，和主流教材（SLAM 十四讲、OpenCV）是反的。
+      </p>
+
+      <h4>推理过程</h4>
+      <ol class="steps">
+        <li><b>单目看不出深度</b><p>已知 P1，只能确定 P 在射线 C1→P1 上。</p></li>
+        <li><b>射线投到右相机是一条直线</b><p>射线和基线在同一个极平面里，极平面与右成像面相交得到的就是右极线 l2。</p></li>
+        <li><b>所以 P2 在 l2 上</b></li>
+      </ol>
+
+      <h4>几个性质</h4>
+      <ul>
+        <li>每条极线都经过极点</li>
+        <li>同一幅图里的所有极线交于同一个极点（极平面绕着基线转）</li>
+        <li>左右极线成对出现，都来自同一个极平面</li>
+      </ul>
+
+      <h4>作用</h4>
+      <ul>
+        <li><strong>降维</strong>：匹配搜索从二维平面降到一维直线，计算量大幅减少</li>
+        <li><strong>减少误匹配</strong>：不在极线上的候选点直接排除</li>
+        <li><strong>立体校正</strong>：把极线变成水平且左右行对齐，匹配只需在同一行里找，由此得到视差</li>
+      </ul>
+    </section>
 
   </article>
 

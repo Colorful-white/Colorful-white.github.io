@@ -253,6 +253,41 @@ article p.tight { margin-bottom: 12px; }
 .log li div { line-height: 1.75; }
 @media (max-width: 520px) { .log li { grid-template-columns: 1fr; gap: 3px; } }
 
+/* ---------- 知识点 ---------- */
+.kp {
+  margin: 0 0 28px; padding: 22px 26px 24px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  backdrop-filter: blur(8px);
+}
+.kp h3 { font-size: 20px; margin: 0 0 12px; }
+article .kp h4 { font-size: 15px; margin: 26px 0 10px; color: var(--accent); letter-spacing: .02em; }
+.kp-one {
+  font-size: 16px !important; color: var(--text) !important;
+  padding: 12px 16px; margin: 0 0 18px !important;
+  border-left: 3px solid var(--accent); background: rgba(156,198,255,.06); border-radius: 0 8px 8px 0;
+}
+.kp-warn { font-size: 13.5px !important; color: #e6a57a !important; margin-top: -6px !important; }
+.kp .steps { margin-top: 4px; }
+
+/* 极线示意图：线条颜色都跟着站点配色走 */
+article figure.kp-fig { margin: 18px 0 8px; }
+.kp-fig svg { display: block; width: 100%; height: auto; max-width: 640px; margin: 0 auto; font-family: inherit; }
+.epi-plane { fill: rgba(156,198,255,.07); stroke: none; }
+.epi-img   { fill: rgba(10,17,32,.55); stroke: var(--muted); stroke-width: 1.2; }
+.epi-base  { stroke: var(--dim); stroke-width: 1.4; stroke-dasharray: 5 5; }
+.epi-ray   { stroke: var(--accent); stroke-width: 1.6; }
+.epi-ghost { stroke: var(--accent); stroke-width: 1; opacity: .35; stroke-dasharray: 3 4; }
+.epi-line  { stroke: #e6a57a; stroke-width: 2.2; }
+.epi-pt    { fill: var(--text); }
+.epi-hit   { fill: var(--accent); stroke: var(--bg); stroke-width: 1.5; }
+.epi-ghost-pt { fill: var(--accent); opacity: .45; }
+.epi-epi   { fill: #e6a57a; }
+.epi-c     { fill: var(--bg); stroke: var(--text); stroke-width: 2; }
+.epi-t     { fill: var(--text); font-size: 15px; font-weight: 600; }
+.epi-soft  { fill: var(--dim); font-size: 12.5px; }
+.epi-line-t, .epi-epi-t { fill: #e6a57a; font-size: 14px; font-weight: 600; }
+@media (max-width: 560px) { .kp { padding: 18px 16px 20px; } }
+
 /* ---------- 下载按钮 ---------- */
 .dl { display: flex; flex-wrap: wrap; gap: 12px; margin: 24px 0 8px; }
 .dl a {
