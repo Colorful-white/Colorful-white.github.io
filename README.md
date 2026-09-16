@@ -19,6 +19,7 @@ pet/pet-data.js            桌宠的形象和台词（从桌宠原项目导出�
 pet/export_from_deskpet.py 桌面版改了形象/台词之后，跑它重新导出
 ripple.js                  详情页的地面水波
 images/                    图片
+diary/                     写长了的随手写单独放一页
 projects/
   deskpet.html             桌宠详情页
   phototag.html            PhotoTag 详情页
