@@ -95,7 +95,8 @@
     var img = seq[frame % seq.length];
     ctx.clearRect(0, 0, PW, PH);
     ctx.save();
-    if (dir < 0) { ctx.translate(PW, 0); ctx.scale(-1, 1); }
+    // 原图尾巴在右边，是朝左走的样子；朝右走时镜像，尾巴才拖在身后
+    if (dir > 0) { ctx.translate(PW, 0); ctx.scale(-1, 1); }
     ctx.drawImage(img, 0, 0);
     ctx.restore();
   }
