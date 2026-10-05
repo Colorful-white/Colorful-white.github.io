@@ -18,6 +18,9 @@
 
 window.NOTES = `
 
+2026-10-02 | cld 被封禁了
+我的cld还是被封禁了，哎哎
+
 2026-09-16 | 装 ANSYS 的这两晚
 一门课要用 ANSYS，装了两天。老师给的包里查出蠕虫，setup 被改名藏了起来，许可界面又卡在第 33 步。
 <a href="diary/ansys.html">读全文 →</a>
