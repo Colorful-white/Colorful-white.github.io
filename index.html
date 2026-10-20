@@ -29,6 +29,9 @@
     <h1>你好，我是 Budroval</h1>
     <p class="lede">做点自己喜欢的东西。</p>
     <div class="links">
+      <a href="#projects">作品</a>
+      <a href="videos/">视频</a>
+      <a href="#notes-section">随手写</a>
       <a href="https://github.com/Colorful-white">GitHub</a>
       <!-- 想留联系方式就把下面这行的注释去掉、填上邮箱。注意公开在网页上会被爬虫抓去发垃圾邮件 -->
       <!-- <a href="mailto:你的邮箱">邮箱</a> -->
@@ -38,8 +41,25 @@
   <div class="layout">
   <main>
 
+  <section aria-labelledby="videos-heading">
+    <div class="section-top">
+      <h2 class="sec" id="videos-heading">视频</h2>
+      <a href="videos/">进入视频栏目 →</a>
+    </div>
+    <div class="film-teasers">
+      <a class="film-teaser" href="videos/#hiding-in-the-blue">
+        <div class="film-art"><img src="images/hiding-in-the-blue-cover.webp" alt="把一首歌，变成一个世界：Hiding in the Blue 视频封面" width="1200" height="900"></div>
+        <div class="film-info"><h3>Hiding in the Blue</h3><p>AI 音乐视觉实验 <span>03:42</span></p></div>
+      </a>
+      <a class="film-teaser" href="videos/#same-green">
+        <div class="film-art"><img src="images/same-green-cover.webp" alt="你眼中的世界，和我一样吗？两片蓝绿色字符叶片" width="1200" height="678"></div>
+        <div class="film-info"><h3>眼中的世界</h3><p>你眼中的世界，和我一样吗？ <span>03:36</span></p></div>
+      </a>
+    </div>
+  </section>
+
   <!-- ================= 作品（左栏） ================= -->
-  <section>
+  <section id="projects">
     <h2 class="sec">做过的东西</h2>
     <div class="cards">
 
@@ -123,7 +143,7 @@
   <aside class="side">
 
   <!-- ================= 随手写（右栏） ================= -->
-  <section>
+  <section id="notes-section">
     <h2 class="sec">随手写</h2>
 
     <!-- 内容在 notes.js 里，改那个文件就行，别动这儿 -->

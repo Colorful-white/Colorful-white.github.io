@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>视频 — Budroval</title>
+<meta name="description" content="一些想法，也把喜欢的音乐变成画面。Budroval 的视频作品。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐾</text></svg>">
+<meta property="og:type" content="website">
+<meta property="og:title" content="视频 — Budroval">
+<meta property="og:description" content="一些想法，也把喜欢的音乐变成画面。">
+<meta property="og:image" content="https://colorful-white.github.io/images/hiding-in-the-blue-cover.webp">
+<meta property="og:url" content="https://colorful-white.github.io/videos/">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<canvas id="water"></canvas>
+<div class="veil veil--page"></div>
+
+<div class="wrap wrap--videos">
+  <a class="back" href="../index.html">← 回首页</a>
+  <article>
+    <h1>视频</h1>
+    <p class="lede">一些想法，也把喜欢的音乐变成画面。</p>
+    <nav class="video-index" aria-label="视频目录">
+      <a href="#hiding-in-the-blue">Hiding in the Blue</a>
+      <a href="#same-green">眼中的世界</a>
+    </nav>
+
+    <section class="video-entry" id="hiding-in-the-blue" aria-labelledby="blue-title">
+      <h2 id="blue-title">AI 音乐视觉实验｜《Hiding in the Blue》</h2>
+      <div class="video-meta"><p>把一首歌，变成一个世界 · 03:42</p><a href="hiding-in-the-blue.mp4">打开视频文件 ↗</a></div>
+      <figure>
+        <video controls playsinline preload="none" poster="../images/hiding-in-the-blue-cover.webp" width="1600" height="900" aria-label="Hiding in the Blue 音乐视觉实验">
+          <source src="hiding-in-the-blue.mp4" type="video/mp4">
+          你的浏览器暂不支持播放，请<a href="hiding-in-the-blue.mp4">打开视频文件</a>观看。
+        </video>
+      </figure>
+      <p class="video-description">我想看看，同一首歌在 AI 的理解和想象里，会是什么样子。于是，我把《Hiding in the Blue》交给它，尝试把旋律、歌词和声音带来的联想变成看得见的画面，让另一个视角里的音乐具象化。我也想通过这样的尝试，给自己喜欢的音乐赋予更多的内容。</p>
+      <p class="video-meta">歌曲：TheFatRat &amp; RIELL — Hiding in the Blue</p>
+    </section>
+
+    <section class="video-entry" id="same-green" aria-labelledby="green-title">
+      <h2 id="green-title">眼中的世界</h2>
+      <div class="video-meta"><p>你眼中的世界，和我一样吗？ · 03:36</p><a href="same-green.mp4">打开视频文件 ↗</a></div>
+      <figure>
+        <video controls playsinline preload="none" poster="../images/same-green-cover.webp" width="1600" height="900" aria-label="眼中的世界 字符动画短片">
+          <source src="same-green.mp4" type="video/mp4">
+          你的浏览器暂不支持播放，请<a href="same-green.mp4">打开视频文件</a>观看。
+        </video>
+      </figure>
+      <p class="video-description">我们都把一片叶子叫作绿色，看到的却一定是同一种颜色吗？从这个问题出发，用字符和线条试着描绘感官里的世界。</p>
+      <p class="video-meta">配乐：Ólafur Arnalds — saman</p>
+    </section>
+  </article>
+  <footer>
+    <span>© 2026 Budroval</span>
+    <span><a href="../index.html">回首页</a> · <a href="https://github.com/Colorful-white/Colorful-white.github.io">本站源码</a></span>
+  </footer>
+</div>
+<script src="../ripple.js"></script>
+<script src="player.js"></script>
+</body>
+</html>

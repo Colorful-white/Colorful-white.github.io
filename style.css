@@ -175,6 +175,38 @@ section { margin-bottom: 72px; }
   .tags { justify-content: flex-start; }
 }
 
+/* ---------- 视频栏目 ---------- */
+.section-top { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 24px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+.section-top h2.sec { margin: 0; padding: 0; border: 0; }
+.section-top > a { font-size: 13px; text-decoration: none; white-space: nowrap; }
+.film-teasers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+.film-teaser { display: block; min-width: 0; overflow: hidden; color: inherit; text-decoration: none; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; transition: border-color .2s, transform .2s; }
+.film-teaser:hover { border-color: var(--border-lit); transform: translateY(-3px); }
+.film-art { aspect-ratio: 4 / 3; display: flex; align-items: center; background: #040a13; }
+.film-art img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.film-info { padding: 18px 20px; }
+.film-info h3 { margin: 0 0 6px; font-size: 18px; line-height: 1.5; }
+.film-info p { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 12px; margin: 0; font-size: 12.5px; color: var(--muted); }
+.film-info span { color: var(--dim); font-variant-numeric: tabular-nums; }
+.wrap--videos { max-width: 1060px; }
+.video-index { display: flex; flex-wrap: wrap; gap: 12px 24px; margin: -12px 0 44px; font-size: 14px; }
+.video-entry { scroll-margin-top: 32px; padding-top: 28px; border-top: 1px solid var(--border); }
+article .video-entry h2 { margin: 0 0 8px; font-size: 24px; line-height: 1.5; overflow-wrap: anywhere; }
+.video-meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 18px; font-size: 13px; color: var(--dim); }
+.video-meta p { margin: 0; color: var(--dim); }
+.video-meta a { font-size: 13px; }
+article .video-entry figure { margin: 22px 0 14px; }
+.video-entry video { aspect-ratio: 16 / 9; object-fit: contain; }
+.video-description { max-width: 68ch; font-size: 15px; }
+.video-entry:target { border-top-color: var(--border-lit); }
+.film-teaser:focus-visible, .video-index a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+@media (max-width: 560px) {
+  .film-teasers { grid-template-columns: 1fr; gap: 20px; }
+  .film-art { aspect-ratio: auto; }
+  .film-art img { height: auto; }
+  article .video-entry h2 { font-size: 21px; }
+}
+
 /* ---------- 随手写 ---------- */
 .note { padding-bottom: 32px; margin-bottom: 32px; border-bottom: 1px solid var(--border); }
 .note:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom: 0; }
