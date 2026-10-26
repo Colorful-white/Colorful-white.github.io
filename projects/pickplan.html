@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>拾计划 PickPlan — Budroval</title>
+<meta name="description" content="把待办放进一周的日程表，点时段添加任务，做完勾掉。支持自定义颜色、每周循环和通知栏提醒。安卓 App。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐾</text></svg>">
+<meta property="og:type" content="article">
+<meta property="og:title" content="拾计划 PickPlan">
+<meta property="og:description" content="一眼看到这周要做的事，点一下时段添加，完成后勾掉。">
+<meta property="og:image" content="https://colorful-white.github.io/images/pickplan-icon.png">
+<meta property="og:url" content="https://colorful-white.github.io/projects/pickplan.html">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<canvas id="water"></canvas>
+<div class="veil veil--page"></div>
+
+<div class="wrap">
+  <a class="back" href="../index.html#projects">← 回首页</a>
+  <article>
+    <h1>拾计划 PickPlan</h1>
+    <p class="lede">一个直观的日程待办小软件。把要做的事放进一周的日程表，点一下相应时段就能添加，做完勾掉，让眼前只留下还没完成的事。</p>
+
+    <div class="dl">
+      <a href="../files/PickPlan-0.5.0.apk" download>下载安装包 <span class="meta">0.5.0 · APK · 3.1 MB</span></a>
+    </div>
+    <p class="dl-note">支持 Android 8.0 及以上，iPhone 无法安装。下载后打开 APK，按手机提示允许浏览器或文件管理器安装此应用。</p>
+
+    <h2>怎么用</h2>
+    <div class="table-scroll">
+      <table>
+        <tr><th>看日程</th><td>周一到周日、上午和下午分区展示，能前后切换周次，也能回到本周。下方列出本周未完成的任务。</td></tr>
+        <tr><th>加任务</th><td>点击日程表里的相应区域，填写要做的事和起止时间，保存即可。点已添加的任务内容可以编辑。</td></tr>
+        <tr><th>做完勾掉</th><td>点击任务的勾选框，已完成的任务会收进回收站；在回收站里可以恢复，也可以清空。</td></tr>
+        <tr><th>自定义颜色</th><td>给任务选一种颜色来区分，既有常用色块，也能用调色盘自由选色。</td></tr>
+        <tr><th>每周重复</th><td>开启“每周循环”，后续每周同一时间都会出现。完成本周任务，不影响下一周。</td></tr>
+      </table>
+    </div>
+
+    <h2>通知栏提醒</h2>
+    <p>添加或编辑任务时勾选“提醒”，设置提醒日期和时间。新任务默认在开始前一小时提醒，也可以自己调整。</p>
+    <ol class="steps">
+      <li><b>允许通知</b><p>按软件提示开启通知权限，让任务提醒显示在手机的下拉通知栏里。</p></li>
+      <li><b>允许“闹钟和提醒”</b><p>Android 12 及以上会引导开启这项权限；未允许时，系统可能延后提醒。</p></li>
+      <li><b>留意手机的后台限制</b><p>不需要一直停留在软件界面。若手机限制了后台运行，或你强制停止了软件，提醒可能受影响；声音、振动和横幅由手机的通知设置控制。</p></li>
+    </ol>
+
+    <p class="dl-note">任务保存在手机本地，无需登录或联网。</p>
+  </article>
+  <footer>
+    <span>© 2026 Budroval</span>
+    <span><a href="../index.html#projects">回首页</a></span>
+  </footer>
+</div>
+<script src="../ripple.js"></script>
+<script src="../sound.js"></script>
+</body>
+</html>
