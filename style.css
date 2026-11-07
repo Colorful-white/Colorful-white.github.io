@@ -305,6 +305,19 @@ article .kp h4 { font-size: 15px; margin: 26px 0 10px; color: var(--accent); let
 .kp-warn { font-size: 13.5px !important; color: #e6a57a !important; margin-top: -6px !important; }
 .kp .steps { margin-top: 4px; }
 
+/* 相移原理：公式不依赖外部字体或脚本，窄屏时在公式块内滚动 */
+.kp .phase-equation {
+  margin: 14px 0 18px; padding: 14px 18px;
+  overflow-x: auto; border: 1px solid var(--border); border-radius: 10px;
+  background: rgba(8,14,26,.65); color: var(--text);
+  font: 19px/1.9 "Cambria Math", "Times New Roman", serif;
+}
+.phase-equation > div { white-space: nowrap; }
+.phase-equation--key { border-left: 3px solid var(--accent) !important; }
+.phase-equation sub { font-size: .7em; }
+.kp .phase-caption { text-align: left; color: var(--dim); font-size: 13px; padding-bottom: 8px; }
+.kp .phase-sources { font-size: 13px; color: var(--dim); margin-top: 24px; }
+
 /* 极线示意图：线条颜色都跟着站点配色走 */
 article figure.kp-fig { margin: 18px 0 8px; }
 .kp-fig svg { display: block; width: 100%; height: auto; max-width: 640px; margin: 0 auto; font-family: inherit; }

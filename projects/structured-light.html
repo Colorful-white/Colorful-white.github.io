@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>结构光3D重建系统 — Budroval</title>
-<meta name="description" content="从零搭一套结构光 3D 重建系统，边学边记。">
+<meta name="description" content="从零搭一套结构光 3D 重建系统，记录极线约束、N 步相移与相位解包裹的原理。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐾</text></svg>">
 <meta property="og:type" content="article">
 <meta property="og:title" content="结构光3D重建系统">
 <meta property="og:image" content="https://colorful-white.github.io/images/structured-light-phase.png">
-<meta property="og:description" content="从零搭一套结构光 3D 重建系统，边学边记。">
+<meta property="og:description" content="从零搭一套结构光 3D 重建系统，记录极线约束、N 步相移与相位解包裹的原理。">
 <link rel="stylesheet" href="../style.css">
 </head>
 <body>
@@ -144,6 +144,105 @@
         <li><strong>减少误匹配</strong>：不在极线上的候选点直接排除</li>
         <li><strong>立体校正</strong>：把极线变成水平且左右行对齐，匹配只需在同一行里找，由此得到视差</li>
       </ul>
+    </section>
+
+    <section class="kp" id="n-step-phase">
+      <h3>N 步相移：从亮度求相位</h3>
+      <p class="kp-one">让条纹按已知幅度移动，记录<strong>同一个像素</strong>的亮度变化，再由这些亮度反推出该像素的相位。</p>
+
+      <h4>1. 相位表示一个点处在条纹周期的什么位置</h4>
+      <p>正弦条纹的亮度会按“亮 → 暗 → 亮”周期性变化。用角度描述这个过程：</p>
+      <div class="table-scroll">
+        <table>
+          <caption class="phase-caption">一个条纹周期中的相位与亮度</caption>
+          <thead><tr><th scope="col">相位</th><th scope="col">亮度状态</th></tr></thead>
+          <tbody>
+            <tr><td>0°</td><td>最亮</td></tr>
+            <tr><td>90°</td><td>中间亮度，正在变暗</td></tr>
+            <tr><td>180°</td><td>最暗</td></tr>
+            <tr><td>270°</td><td>中间亮度，正在变亮</td></tr>
+            <tr><td>360°</td><td>再次最亮，进入下一周期</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>一张图里，中间亮度可能对应 90°，也可能对应 270°。再加上不同位置本身的亮度和条纹对比度可能不同，<strong>只看一张图，通常无法唯一确定相位</strong>。相移法通过多张图消除这些歧义。</p>
+
+      <h4>2. N 步，就是给条纹施加 N 个已知的相位偏移</h4>
+      <p>例如四步相移，依次加入 0°、90°、180°、270° 的偏移。物体、相机保持不动，改变的是条纹的相位。对某个固定像素，亮度模型为：</p>
+      <div class="phase-equation" role="math" aria-label="I 下标 k 等于 A 加 B 乘 cos，括号内为 phi 加 delta 下标 k">
+        I<sub>k</sub> = A + B cos(φ + δ<sub>k</sub>)
+      </div>
+      <div class="table-scroll">
+        <table>
+          <caption class="phase-caption">亮度模型中的未知量</caption>
+          <thead><tr><th scope="col">符号</th><th scope="col">含义</th></tr></thead>
+          <tbody>
+            <tr><td>A</td><td>平均亮度，决定整体偏亮还是偏暗</td></tr>
+            <tr><td>B</td><td>条纹调制幅度，决定明暗变化有多强，取 B ≥ 0</td></tr>
+            <tr><td>φ</td><td>这个像素原本的相位，是我们要解的量</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>每张图给出一个亮度观测值，多张图共同约束这三个未知量。在这个模型下，至少需要三个合适的相移位置。同一个像素在不同图片里的 A、B、φ 应当保持一致，只有已知的 δ<sub>k</sub> 发生变化。</p>
+      <p>如果某处 B 接近 0，说明这个像素几乎没有条纹亮度变化，它的相位也就难以可靠求出。</p>
+
+      <h4>3. 用四步相移，看相位怎样算出来</h4>
+      <p>把四个偏移量代入，并用三角函数关系展开：</p>
+      <div class="phase-equation" role="math" aria-label="四步相移的亮度表达式">
+        <div>I<sub>0</sub> = A + B cos φ</div>
+        <div>I<sub>1</sub> = A − B sin φ</div>
+        <div>I<sub>2</sub> = A − B cos φ</div>
+        <div>I<sub>3</sub> = A + B sin φ</div>
+      </div>
+      <p>两两相减：</p>
+      <div class="phase-equation" role="math" aria-label="I 零减 I 二等于二 B cos phi；I 三减 I 一等于二 B sin phi">
+        <div>I<sub>0</sub> − I<sub>2</sub> = 2B cos φ</div>
+        <div>I<sub>3</sub> − I<sub>1</sub> = 2B sin φ</div>
+      </div>
+      <p>这一步很关键：<strong>相减消除了平均亮度 A，得到了一对分别与余弦、正弦成正比的数。</strong>于是：</p>
+      <div class="phase-equation phase-equation--key" role="math" aria-label="phi 等于 atan2，参数为 I 三减 I 一，I 零减 I 二">
+        φ = atan2(I<sub>3</sub> − I<sub>1</sub>, I<sub>0</sub> − I<sub>2</sub>)
+      </div>
+      <p><code>atan2(y, x)</code> 可以理解成：已知一个方向的纵向分量和横向分量，求它的角度。两个分量都有相同的系数 2B，所以角度不受这个系数影响。普通的 arctan(y/x) 无法完整区分四个象限，因此这里使用 atan2。</p>
+      <p>例如 I<sub>0</sub> − I<sub>2</sub> = 40，I<sub>3</sub> − I<sub>1</sub> ≈ 69.3，那么 φ = atan2(69.3, 40) ≈ 60°。这就解出了该像素的相位。<strong>对整张图的每个像素重复这个计算，就得到一张相位图。</strong></p>
+
+      <h4>4. 从四步推广到 N 步，原理相同</h4>
+      <p>对于覆盖一个周期、等间隔的 N 步相移，取 N ≥ 3：</p>
+      <div class="phase-equation" role="math" aria-label="delta 下标 k 等于二 pi k 除以 N，k 从零到 N 减一">
+        δ<sub>k</sub> = 2πk / N，k = 0, …, N − 1
+      </div>
+      <p>分别把各张图的亮度乘以对应的余弦和正弦，再求和。下面的 Σ 都表示对 k = 0 到 N − 1 求和：</p>
+      <div class="phase-equation" role="math" aria-label="C 为 I k cos delta k 的总和；S 为 I k sin delta k 的总和">
+        <div>C = Σ I<sub>k</sub> cos δ<sub>k</sub></div>
+        <div>S = Σ I<sub>k</sub> sin δ<sub>k</sub></div>
+      </div>
+      <p>由于这些相移位置均匀分布，求和后，平均亮度项以及交叉项会抵消，留下：</p>
+      <div class="phase-equation" role="math" aria-label="C 等于 N B 除以二乘 cos phi；S 等于负 N B 除以二乘 sin phi">
+        <div>C = (NB / 2) cos φ</div>
+        <div>S = −(NB / 2) sin φ</div>
+      </div>
+      <p>所以 N 步相移的核心公式是：</p>
+      <div class="phase-equation phase-equation--key" role="math" aria-label="phi 等于 atan2，参数为负 S 和 C">
+        φ = atan2(−S, C)
+      </div>
+      <p>负号来自这里采用的 cos(φ + δ<sub>k</sub>) 模型。如果仿真采用减号，或图像顺序不同，相应公式也要调整；已知但不等间隔的相移，可以通过最小二乘拟合求解，不能直接套用上面的等间隔求和公式。</p>
+
+      <h4>5. 为什么解出相位后，还需要“解包裹”</h4>
+      <p>正弦函数每隔 2π 就重复一次：</p>
+      <div class="phase-equation" role="math" aria-label="cos phi 等于 cos 括号 phi 加二 pi，也等于 cos 括号 phi 加四 pi">
+        cos φ = cos(φ + 2π) = cos(φ + 4π)
+      </div>
+      <p>因此，上述计算只能判断一个点在<strong>当前周期内的位置</strong>，无法直接判断它属于第几个周期。得到的通常是 [−π, π] 范围内的“包裹相位”。</p>
+      <p>例如真实相位沿一行逐渐增加，从 0、0.5π 一直增加到 2π、2.5π，计算结果却会折回到同一个范围，出现约 2π 的跳变。解包裹就是确定每个位置应补上多少个 2π：</p>
+      <div class="phase-equation phase-equation--key" role="math" aria-label="展开相位大 phi 等于包裹相位小 phi 加二 pi 乘整数 m">
+        Φ(x, y) = φ(x, y) + 2πm(x, y)
+      </div>
+      <p>整数 m 表示周期级次。空间连续性、多频条纹、格雷码等，都可以为确定这个整数提供条件。空间展开还依赖采样足够密、噪声较小等条件；仅凭单频 N 张图，一般不能唯一确定绝对级次，不连通区域之间也可能存在独立的周期歧义。</p>
+
+      <h4>6. 相位图与三维重建是什么关系</h4>
+      <p>处理一组仿真图时，先利用各像素随相移变化的亮度求包裹相位，再根据仿真条件判断怎样展开。<strong>相位通常还包含投影条纹本身的变化，不能直接把相位数值当成物体高度。</strong>恢复高度或面形，还需要相应的参考关系或标定与几何模型。</p>
+      <p>求解是否可靠，可以结合条纹调制度、亮度模型的拟合残差，以及与仿真真实相位的误差来检查。</p>
+      <p class="phase-sources">代码参考：<a href="https://github.com/hwang051785/pyfringe/blob/main/nstep_fringe.py">pyfringe 的 N 步相位计算</a> · <a href="https://github.com/nzhagen/fpp_tools">fpp_tools 的相移与最小二乘求解</a></p>
     </section>
 
   </article>
