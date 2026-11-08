@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>结构光3D重建系统 — Budroval</title>
-<meta name="description" content="从零搭一套结构光 3D 重建系统，记录极线约束、N 步相移与相位解包裹的原理。">
+<meta name="description" content="从零搭一套结构光 3D 重建系统，记录极线约束、N 步相移原理和 Python 四步相移实践。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐾</text></svg>">
 <meta property="og:type" content="article">
 <meta property="og:title" content="结构光3D重建系统">
 <meta property="og:image" content="https://colorful-white.github.io/images/structured-light-phase.png">
-<meta property="og:description" content="从零搭一套结构光 3D 重建系统，记录极线约束、N 步相移与相位解包裹的原理。">
+<meta property="og:description" content="从零搭一套结构光 3D 重建系统，记录极线约束、N 步相移原理和 Python 四步相移实践。">
 <link rel="stylesheet" href="../style.css">
 </head>
 <body>
@@ -38,6 +38,7 @@
     <nav class="kp-index" aria-label="知识点目录">
       <a href="#epipolar">极线约束</a>
       <a href="#n-step-phase">N 步相移</a>
+      <a href="#four-step-practice">四步相移实践</a>
     </nav>
     <!-- 添加知识点时，给 section 一个唯一 id，再在目录里加上对应链接。 -->
 
@@ -248,6 +249,135 @@
       <p>处理一组仿真图时，先利用各像素随相移变化的亮度求包裹相位，再根据仿真条件判断怎样展开。<strong>相位通常还包含投影条纹本身的变化，不能直接把相位数值当成物体高度。</strong>恢复高度或面形，还需要相应的参考关系或标定与几何模型。</p>
       <p>求解是否可靠，可以结合条纹调制度、亮度模型的拟合残差，以及与仿真真实相位的误差来检查。</p>
       <p class="phase-sources">代码参考：<a href="https://github.com/hwang051785/pyfringe/blob/main/nstep_fringe.py">pyfringe 的 N 步相位计算</a> · <a href="https://github.com/nzhagen/fpp_tools">fpp_tools 的相移与最小二乘求解</a></p>
+      <a class="kp-back" href="#knowledge-index">↑ 返回知识点目录</a>
+    </section>
+
+    <section class="kp" id="four-step-practice">
+      <h3>四步相移实践</h3>
+      <p class="kp-one">用四张 T8 仿真条纹图，从读出左上角的第一个灰度值开始，在 Python 里逐行算出包裹相位和展开相位，再画图、验算。</p>
+      <p>这次用到的公式可以和上面的 <a href="#n-step-phase">N 步相移原理</a> 对照着看。</p>
+
+      <h4>1. 准备环境和原始图</h4>
+      <p>练习用 Python 3.14。Pillow 负责读图，NumPy 负责算相位，Matplotlib 负责画图。把压缩包里的四张 PNG 放进练习目录下的 <code>原始图</code> 文件夹。点击缩略图可查看原尺寸。</p>
+      <div class="phase-inputs">
+        <figure>
+          <a href="../images/four-step-practice/T8_phase1.png"><img src="../images/four-step-practice/T8_phase1.png" width="1920" height="1024" loading="lazy" alt="T8 第一帧水平正弦条纹"></a>
+          <figcaption><code>T8_phase1.png</code> · 0°</figcaption>
+        </figure>
+        <figure>
+          <a href="../images/four-step-practice/T8_phase2.png"><img src="../images/four-step-practice/T8_phase2.png" width="1920" height="1024" loading="lazy" alt="T8 第二帧水平正弦条纹"></a>
+          <figcaption><code>T8_phase2.png</code> · 90°</figcaption>
+        </figure>
+        <figure>
+          <a href="../images/four-step-practice/T8_phase3.png"><img src="../images/four-step-practice/T8_phase3.png" width="1920" height="1024" loading="lazy" alt="T8 第三帧水平正弦条纹"></a>
+          <figcaption><code>T8_phase3.png</code> · 180°</figcaption>
+        </figure>
+        <figure>
+          <a href="../images/four-step-practice/T8_phase4.png"><img src="../images/four-step-practice/T8_phase4.png" width="1920" height="1024" loading="lazy" alt="T8 第四帧水平正弦条纹"></a>
+          <figcaption><code>T8_phase4.png</code> · 270°</figcaption>
+        </figure>
+      </div>
+      <p>原包没有附相移角度说明。本次按文件名顺序采用图注里的角度，并使用 <i>I</i><sub>k</sub> = <i>A</i> + <i>B</i> cos(φ + δ<sub>k</sub>) 的加号约定。相位的正方向和零点取决于这个约定。</p>
+      <p><a href="../files/T8-four-step.rar" download>下载四张仿真图的原始压缩包（RAR）</a></p>
+
+      <h4>2. 在 Python 里读第一张图</h4>
+      <p>打开 Python，看到 <code>&gt;&gt;&gt;</code> 后，每输一行就按一次回车。下面的 <code>D:\四步相移练习</code> 是示例，换成存放 <code>原始图</code> 文件夹的实际目录。<code>os.chdir()</code> 是在 Python 里切换目录的命令。如果误粘贴了一段代码，提示符停在 <code>...</code>，按 Ctrl + C 回到 <code>&gt;&gt;&gt;</code> 再继续。</p>
+      <pre><code>import os
+os.chdir(r"D:\四步相移练习")
+from PIL import Image
+im = Image.open(r"原始图\T8_phase1.png")
+print(im.size)
+print(im.getpixel((0, 0)))</code></pre>
+      <pre class="phase-output"><samp>(1920, 1024)
+218</samp></pre>
+      <p><code>im.size</code> 按宽、高显示。左上角坐标是 (0, 0)，读到的 <code>218</code> 对应第一帧在这里的灰度 <i>I</i><sub>1</sub>(0,0)。</p>
+
+      <h4>3. 算出左上角的相位</h4>
+      <p>从四帧取同一个像素。<code>v1</code> 到 <code>v4</code> 分别是这一点的 <i>I</i><sub>1</sub> 到 <i>I</i><sub>4</sub>。</p>
+      <pre><code>v1 = im.getpixel((0, 0))
+v2 = Image.open(r"原始图\T8_phase2.png").getpixel((0, 0))
+v3 = Image.open(r"原始图\T8_phase3.png").getpixel((0, 0))
+v4 = Image.open(r"原始图\T8_phase4.png").getpixel((0, 0))
+print(v1, v2, v3, v4)
+import math
+c = v1 - v3
+s = v4 - v2
+phi0 = math.atan2(s, c)
+print(math.degrees(phi0))</code></pre>
+      <pre class="phase-output"><samp>218 37 37 218
+45.0</samp></pre>
+      <p><code>c</code> 对应公式里的 <i>C</i> = 2<i>B</i> cos φ，<code>s</code> 对应 −<i>S</i> = 2<i>B</i> sin φ，两者在这个像素都等于 181。<code>phi0</code> 是 φ(0,0)，<code>atan2</code> 算出弧度，再用 <code>degrees</code> 转成度。</p>
+
+      <h4>4. 用同一个公式算整张图</h4>
+      <p><code>I1</code> 到 <code>I4</code> 对应四张完整的灰度表 <i>I</i><sub>k</sub>(x,y)。先转成浮点数，灰度相减时就可以保留负值。NumPy 用 <code>[y, x]</code> 取值，先行后列。</p>
+      <pre><code>import numpy as np
+I1 = np.array(im, dtype=float)
+print(I1.shape, I1[0, 0])
+I2 = np.array(Image.open(r"原始图\T8_phase2.png"), dtype=float)
+I3 = np.array(Image.open(r"原始图\T8_phase3.png"), dtype=float)
+I4 = np.array(Image.open(r"原始图\T8_phase4.png"), dtype=float)
+print(I1[0, 0], I2[0, 0], I3[0, 0], I4[0, 0])
+C = I1 - I3
+minus_S = I4 - I2
+phi = np.arctan2(minus_S, C)
+print(phi.shape, np.degrees(phi[0, 0]))</code></pre>
+      <pre class="phase-output"><samp>(1024, 1920) 218.0
+218.0 37.0 37.0 218.0
+(1024, 1920) 45.0</samp></pre>
+      <p><code>C</code> 和 <code>minus_S</code> 是整张图的 <i>C</i> 和 −<i>S</i>。逐像素套用 φ = atan2(−<i>S</i>, <i>C</i>) 后，<code>phi</code> 就是整幅包裹相位 φ(x,y)。左上角仍是 45°，可以和上一步互相核对。</p>
+
+      <h4>5. 沿竖直方向解包裹</h4>
+      <p>固定在最左边一列，观察第 0 到第 8 行。包裹相位从约 179.8° 跳到 −135°。按每行约增加 45° 的趋势，−135° 加上一圈后应接到 225°。</p>
+      <pre><code>print(np.round(np.degrees(phi[:9, 0]), 1))
+Phi = np.unwrap(phi, axis=0)
+print(np.round(np.degrees(Phi[:9, 0]), 1))
+m = np.rint((Phi[:9, 0] - phi[:9, 0]) / (2 * np.pi)).astype(int)
+print(m)</code></pre>
+      <pre class="phase-output"><samp>[  45.    89.8  135.   179.8 -135.   -90.2  -45.    -0.2   45. ]
+[ 45.   89.8 135.  179.8 225.  269.8 315.  359.8 405. ]
+[0 0 0 0 1 1 1 1 1]</samp></pre>
+      <p><code>Phi</code> 对应展开相位 Φ，<code>m</code> 对应 Φ = φ + 2π<i>m</i> 里补上的圈数。<code>axis=0</code> 沿行号增加的方向展开。从第 4 行起补上一圈，所以第 8 行的 45° 也变成了 405°。这里的展开以首行相位为起点。</p>
+
+      <h4>6. 画出最左一列的相位剖面</h4>
+      <pre><code>import matplotlib.pyplot as plt
+fig, ax = plt.subplots(1, 2, figsize=(10, 4))
+ax[0].plot(phi[:64, 0], ".-")
+ax[0].set_title("Wrapped phase (rad)")
+ax[1].plot(Phi[:, 0])
+ax[1].set_title("Unwrapped phase (rad)")
+fig.tight_layout()
+fig.savefig("我的相位剖面.png", dpi=150)</code></pre>
+      <figure>
+        <a href="../images/four-step-practice/phase-profile.png"><img src="../images/four-step-practice/phase-profile.png" width="1500" height="600" loading="lazy" alt="左侧为每约八行重复的包裹相位锯齿，右侧为近似直线的展开相位"></a>
+        <figcaption>练习中保存的相位剖面。左图是 φ 的前 64 行，锯齿约每 8 行重复一次。右图是 Φ 的全部 1024 行。</figcaption>
+      </figure>
+
+      <h4>7. 画出二维相位图</h4>
+      <p>用 <code>imshow</code> 给每个像素按相位着色。左图取 φ 的左上角 64 行、128 列，便于看清周期条纹。右图显示全部 Φ。</p>
+      <pre><code>map_fig, map_ax = plt.subplots(1, 2, figsize=(11, 4))
+wrapped_map = map_ax[0].imshow(phi[:64, :128], cmap="twilight_shifted", vmin=-np.pi, vmax=np.pi, aspect="auto")
+map_ax[0].set_title("Wrapped phase - crop")
+map_fig.colorbar(wrapped_map, ax=map_ax[0], label="rad")
+unwrapped_map = map_ax[1].imshow(Phi, cmap="viridis", aspect="auto")
+map_ax[1].set_title("Unwrapped phase - full image")
+map_fig.colorbar(unwrapped_map, ax=map_ax[1], label="rad")
+map_fig.tight_layout()
+map_fig.savefig("我的相位图.png", dpi=150)</code></pre>
+      <figure>
+        <a href="../images/four-step-practice/phase-maps.png"><img src="../images/four-step-practice/phase-maps.png" width="1650" height="600" loading="lazy" alt="左侧为包裹相位局部图，右侧为从上到下连续渐变的全幅展开相位图"></a>
+        <figcaption>练习中保存的相位图。左侧的相位周期性重复，右侧从上到下连续增加。同一行里的相位相同。</figcaption>
+      </figure>
+
+      <h4>8. 回代第一帧验算</h4>
+      <p><code>A</code> 对应每个像素的平均灰度 <i>A</i>(x,y)。<code>B</code> 对应调制幅度 <i>B</i>(x,y)，两个分量 <i>C</i> 和 −<i>S</i> 的合成长度是 2<i>B</i>，所以要除以 2。用第一帧的 0° 相移把相位代回亮度模型，求重算亮度与原图的均方根误差。</p>
+      <pre><code>A = (I1 + I2 + I3 + I4) / 4
+B = np.hypot(C, minus_S) / 2
+I1_fit = A + B * np.cos(phi)
+rms = np.sqrt(np.mean((I1 - I1_fit)**2))
+print(round(rms, 3))</code></pre>
+      <pre class="phase-output"><samp>0.076</samp></pre>
+      <p>第一帧的回代均方根误差约为 0.076 个灰度级。展开相位从上到下近似线性，拟合出的条纹周期约为 8.00 像素。这组仿真数据恢复出的是规则条纹的相位。</p>
+      <p><a href="../files/T8-phase-data.npz" download>下载完整计算结果（NPZ）</a>。数组包括包裹相位、展开相位、调制幅度和四帧的逐像素拟合均方根残差，尺寸均为 1024 行 × 1920 列。</p>
       <a class="kp-back" href="#knowledge-index">↑ 返回知识点目录</a>
     </section>
 

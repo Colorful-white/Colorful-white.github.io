@@ -324,6 +324,12 @@ article .kp h4 { font-size: 15px; margin: 26px 0 10px; color: var(--accent); let
 .phase-equation sub { font-size: .7em; }
 .kp .phase-caption { text-align: left; color: var(--dim); font-size: 13px; padding-bottom: 8px; }
 .kp .phase-sources { font-size: 13px; color: var(--dim); margin-top: 24px; }
+.phase-inputs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 16px 0 20px; }
+article .phase-inputs figure { margin: 0; }
+#four-step-practice figure img { height: auto; }
+article .phase-inputs img { image-rendering: pixelated; }
+.kp .phase-output { color: var(--accent); }
+@media (max-width: 560px) { .phase-inputs { grid-template-columns: 1fr; } }
 
 /* 极线示意图：线条颜色都跟着站点配色走 */
 article figure.kp-fig { margin: 18px 0 8px; }
