@@ -36,11 +36,25 @@
 
     <h2 id="knowledge-index">知识点</h2>
     <nav class="kp-index" aria-label="知识点目录">
+      <a href="#open-python">找到并打开 Python</a>
       <a href="#epipolar">极线约束</a>
       <a href="#n-step-phase">N 步相移</a>
       <a href="#four-step-practice">四步相移实践</a>
     </nav>
     <!-- 添加知识点时，给 section 一个唯一 id，再在目录里加上对应链接。 -->
+
+    <section class="kp" id="open-python">
+      <h3>找到并打开 Python</h3>
+      <p class="kp-one">按 <strong>Win + R</strong> 打开“运行”，粘贴下面这一整行，再按回车，就能打开本次练习使用的 Python 3.14。</p>
+      <pre><code>%LOCALAPPDATA%\Programs\Python\Python314\python.exe</code></pre>
+      <p><code>%LOCALAPPDATA%</code> 会自动指向当前用户的 <code>AppData\Local</code> 文件夹。这个位置通常是隐藏的，用路径可以直接打开。上面的路径对应本次练习的安装位置，其他电脑按实际版本和目录替换。</p>
+      <p>看到 <code>&gt;&gt;&gt;</code> 就可以输入 Python 代码了。每行输入完按一次回车。试着输入下面这一行，应该得到 <code>2</code>。</p>
+      <pre><code>print(1 + 1)</code></pre>
+      <p>如果想查看安装文件夹，在资源管理器按 <strong>Ctrl + L</strong>，粘贴下面这行，再按回车。里面的 <code>python.exe</code> 就是启动程序。</p>
+      <pre><code>%LOCALAPPDATA%\Programs\Python\Python314</code></pre>
+      <p>如果提示符停在 <code>...</code>，按 <strong>Ctrl + C</strong> 回到 <code>&gt;&gt;&gt;</code>。导入库、给变量赋值成功时，通常会直接回到提示符。</p>
+      <a class="kp-back" href="#knowledge-index">↑ 返回知识点目录</a>
+    </section>
 
     <section class="kp" id="epipolar">
       <h3>极线约束</h3>
